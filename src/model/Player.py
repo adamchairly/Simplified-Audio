@@ -4,51 +4,44 @@ import vlc
 from vlc import EventType
 import sys
 from PyQt5.QtGui import QIcon
-
+from vlc import Instance
 class Player(QObject):
     stateChanged = pyqtSignal()
     positionChanged = pyqtSignal(float)
-    durationChanged = pyqtSignal(int)
     mediaChanged = pyqtSignal()
+    mediaEnd = pyqtSignal()
 
     def __init__(self, media_path):
         super().__init__()
         self.player = vlc.MediaPlayer(media_path)
-
-
-        self.old_state = None
-        self.old_media = None
-        self.old_position = None
-        self.old_duration = None
-
         self.events = self.player.event_manager()
         self.events.event_attach(EventType.MediaPlayerPositionChanged, self.position_changed, self.player)
-        self.events.event_attach(EventType.MediaPlayerMediaChanged, self.media_end, self.player)
+        self.events.event_attach(EventType.MediaPlayerEndReached, self.media_end, self.player)
         self.player.audio_set_volume(50)
+        
         self.player.play()
     
     def set_media(self, media_path):
         #media = self.instance.media_new_path(media_path)
         #self.player.set_media(media)
-
         #elf.mediaChanged.emit()
-        print('MediaChanged')
+        #TODO
+        pass
 
     def position_changed(self, event, player):
 
         position = self.player.get_position()
-
-        #print(f'pos:{position} % duration: {duration / 1000} seconds')
-
         if self.old_position != position:
             self.positionChanged.emit(position * 100) #Percentage of the track that has been played
             self.old_position = position
 
     def media_end(self,event,player):
-        print('finished')
-        self.player.stop()
-        self.player.set_media(None)
-        self.mediaChanged.emit()
+
+        if self.player.is_playing():
+            self.player.stop()
+
+        self.mediaEnd.emit()
+        
         
         
 

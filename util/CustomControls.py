@@ -26,6 +26,9 @@ class CircularButton(QPushButton):
             QPushButton:pressed {
                 background-color: #80717184;
             }
+            QPushButton:disabled {
+                background-color: #B3717184;
+            }
             """)
         
 class RoundEdgesWidget(QWidget):
@@ -89,6 +92,9 @@ class ModernSlider(QSlider):
             background: #2F2F37;
             height: {height}px;
             margin: {height // 4}px 0;
+        }}
+        QSlider::handle:horizontal:disabled {{
+            background: #bbbbbb;
         }}
         '''
         self.setStyleSheet(slider)
@@ -306,7 +312,6 @@ class AlbumPanel(RoundEdgesWidget):
                 }
                 """)
             
-
 class MetaTablePanel(RoundEdgesWidget):
     def __init__(self, audio):
         super().__init__()
