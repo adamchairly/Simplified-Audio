@@ -1,7 +1,13 @@
-from PyQt5.QtWidgets import QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QTableWidget, QFrame
+from PyQt5.QtWidgets import QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QFrame, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainterPath, QPainter, QPixmap, QIcon, QColor, QRegion, QPalette
 from qframelesswindow import StandardTitleBar
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QVBoxLayout, QLabel
+from qfluentwidgets import *
+from qfluentwidgets import FluentIcon as FIF
+from PyQt5.QtCore import Qt, QStandardPaths
+from PyQt5.QtWidgets import QWidget, QLabel, QFrame
 
 class CircularButton(QPushButton):
     def __init__(self, icon):
@@ -147,8 +153,6 @@ class PlayerPanel(RoundEdgesWidget):
         self.initUi()
     
     def initUi(self):
-
-
 
         # Play/Pause Button
         self.playButton = CircularButton('icons/pause.svg')
@@ -359,3 +363,68 @@ class MetaTablePanel(RoundEdgesWidget):
                 padding: 5px;
             }
         ''')
+
+class PathSelectPanel(RoundEdgesWidget):
+
+    folderChanged = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.path = ''
+        self.initUi()
+
+    def initUi(self):
+
+        main_layout = QVBoxLayout()
+
+        icon = QIcon('icons/folder.svg')
+        pixmap = icon.pixmap(20, 20) 
+        self.icon_label = QLabel(self)
+        self.icon_label.setPixmap(pixmap)
+
+        self.text = QLabel('Import music folder', self)
+
+        self.button = CircularButton(QIcon('icons/folder-plus.svg'))
+        self.button.clicked.connect(self._onClick)
+
+        self.line = QFrame()
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+
+        self.pathLabel = QLabel('',self)
+        
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.pathLabel)
+        vbox.addWidget(self.line)
+
+        # Top layout
+        top_layout = QHBoxLayout()
+        top_layout.setSpacing(10)
+        top_layout.addWidget(self.icon_label)
+        top_layout.addWidget(self.text)
+        top_layout.addStretch(1)
+        top_layout.addWidget(self.button)
+
+        # Bottom Layout
+        bottom_layout = QHBoxLayout()
+        bottom_layout.addStretch(1)
+        bottom_layout.addLayout(vbox)
+        bottom_layout.addStretch(1)
+
+        main_layout.setSpacing(5)
+        main_layout.addLayout(top_layout)
+        main_layout.addWidget(self.line)
+        main_layout.addLayout(bottom_layout)
+        self.setLayout(main_layout)
+
+        self.setStyleSheet("QLabel { color: #CCFFFFFF; }")
+
+    def _onClick(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        folder_path = QFileDialog.getExistingDirectory(self,"Select Folder", "", options=options)
+        if folder_path:
+            self.pathLabel.setText(f'Folder: {folder_path}')
+            self.path = folder_path
+            self.folderChanged.emit(folder_path)
+

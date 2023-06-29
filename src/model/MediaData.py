@@ -15,10 +15,11 @@ class MediaData:
     def __init__(self, filepath):
 
         self.filepath = filepath
+        self.title = 'Unknown'
         self.audio = None
-        self.artist = 'error'
-        self.album = 'error'
-        self.type = 'error'
+        self.artist = 'Unknown'
+        self.album = 'Unknown'
+        self.type = 'Unknown'
         self.length = 0
         self.artwork = None
         self.has_cover = False
@@ -43,12 +44,12 @@ class MediaData:
              
     def get_mp3_metadata(self, filepath):
         
-        print('belementem')
         self.audio = MP3(filepath, ID3=ID3)
+        self.title = self.audio.get('artist', ['Unknown'])[0]
         self.type = 'mp3'
         self.length = self.convert_seconds(self.audio.info.length)
-        self.artist = self.audio['TPE1'].text[0]
-        self.album = self.audio['TALB'].text[0]
+        self.artist = self.audio.get('TPE1', ['Unknown'])[0]
+        self.album = self.audio.get('TALB', ['Unknown'])[0]
         self.has_cover = True if self.audio.tags.getall('APIC') else False
 
     def get_flac_metadata(self, filepath):
@@ -56,16 +57,16 @@ class MediaData:
         self.audio = FLAC(filepath)
         self.type = 'flac'
         self.length = self.convert_seconds(self.audio.info.length)
-        self.artist = self.audio['artist']
-        self.album = self.audio['album']
+        self.artist = self.audio.get('artist', ['Unknown'])[0]
+        self.album = self.audio.get('album', ['Unknown'])[0]
         self.has_cover = len(self.audio.pictures) > 0
 
     def get_wav_metadata(self, filepath):
 
         self.audio = mutagen.File(filepath)
         self.length = self.convert_seconds(self.audio.info.length)
-        self.artist = None
-        self.album = None
+        self.artist = 'Unknown'
+        self.album = 'Unknown'
         self.has_cover = False
 
     def get_m4a_metadata(self, filepath):
@@ -73,8 +74,8 @@ class MediaData:
         self.audio = MP4(filepath)
         self.type = 'm4a'
         self.length = self.convert_seconds(self.audio.info.length)
-        self.artist = self.audio['\xa9ART']
-        self.album = self.audio['\xa9alb']
+        self.artist = self.audio.get('\xa9ART', ['Unknown'])[0]
+        self.album = self.audio.get('\xa9alb', ['Unknown'])[0]
         self.has_cover = 'covr' in self.audio
 
     def extract_album_cover(self, output_path):
@@ -125,6 +126,16 @@ class MediaData:
     def convert_seconds(self, seconds):
         minutes, seconds = divmod(seconds, 60)
         return f"{int(minutes)}:{int(seconds):02d}"
+    
+    def import_folder(self, folder):
+
+        for filename in os.listdir(folder):
+            filepath = os.path.join(folder, filename)
+            if not os.path.isfile(filepath):
+                continue
+            track = MediaData(filepath)
+            track.get_audio_metadata()
+            #TODO here add the track
 
 # Go through all files in the folder
 #for filename in os.listdir(folder):

@@ -1,31 +1,25 @@
 # coding:utf-8
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QSpacerItem, QSizePolicy, QWidget, QSlider
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl, QTimer
-from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
+from PyQt5.QtGui import QIcon
 from src.model import MediaData, Player
-from qfluentwidgets import (ToolButton, Slider)
-from util.CustomControls import CircularButton, RoundEdgesWidget, ModernSlider, PlayerPanel,VolumePanel, AlbumPanel, MetaTablePanel
+from util.CustomControls import PlayerPanel,VolumePanel, AlbumPanel, MetaTablePanel
 import pythoncom
 
 class PlayerView(QFrame):
     def __init__(self, text: str, parent=None):
         super().__init__(parent= parent)
 
-        pythoncom.CoInitialize()
         self.audio = MediaData.MediaData('D:/Zene/test/Airdrop - tom.mp3')
-        print(self.audio.artist)
-        print(self.audio.length)
-        print(self.audio.type)
+        #print(self.audio.artist)
+        #print(self.audio.length)
+        #print(self.audio.type)
 
         self.mediaPlayer = Player.Player('D:/Zene/test/Airdrop - tom.mp3')
-        #self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
         self.mediaPlayer.positionChanged.connect(self.positionChanged)
         self.mediaPlayer.mediaChanged.connect(self.mediaChanged)
+        self.mediaPlayer.mediaEnd.connect(self.mediaEnd)
 
         self.playerPanel = PlayerPanel()
-        
         self.volumePanel = VolumePanel()
         self.albumPanel = AlbumPanel(self.audio)
         self.metaPanel = MetaTablePanel(self.audio)
@@ -93,9 +87,13 @@ class PlayerView(QFrame):
         return f"{int(minutes)}:{int(seconds):02d}"
         
     def mediaChanged(self):
+        #TODO
+        self.mediaPlayer.player.set_position(0.0)
         self.playerPanel.trackTime.setText(self.audio.length)
         self.playerPanel.playButton.setIcon(QIcon('icons/pause.svg'))
         self.mediaPlayer.player.audio_set_volume(50)
+        
+        self.mediaPlayer.player.play()
         
     def mute(self):
         self.mediaPlayer.player.audio_set_mute(True)
@@ -112,6 +110,14 @@ class PlayerView(QFrame):
         self.mediaPlayer.player.audio_set_volume(volume) # volume is in the range 0-100
         print(volume)
 
+    def mediaEnd(self):
+        self.playerPanel.currentTime.setText("0:00")
+        self.playerPanel.trackTime.setText("0:00")
+        self.playerPanel.slider.setDisabled(True)
+        self.playerPanel.slider.setValue(0)
+        self.playerPanel.leftButton.setDisabled(True)
+        self.playerPanel.rightButton.setDisabled(True)
+        self.playerPanel.playButton.setDisabled(True)
 
    
         
