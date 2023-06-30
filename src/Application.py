@@ -15,6 +15,7 @@ class Application(QApplication):
 
         self.mediaPlayer = Player('')
         self.controller.setMedia(self.mediaPlayer)
+        self.mediaPlayer.set_controller(self.controller)
 
         self.db = MusicDatabase(self.controller)
         self.controller.setDB(self.db)

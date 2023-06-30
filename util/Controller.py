@@ -56,6 +56,9 @@ class Controller:
 
         print(f'Media set to {path}')
     
+    def _applyEq(self, settings):
+        self.media.apply_equalizer_settings(settings)
+
     def positionChange(self):
         self.window.playerView.positionChanged(self.media.player.get_time() / 1000, self.media.player.get_length() / 1000)
 

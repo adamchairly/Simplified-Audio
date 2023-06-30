@@ -12,10 +12,14 @@ class SettingsView(QFrame):
         
     def initUi(self):
         self.importPanel = PathSelectPanel()
+        self.extractPanel = PathSelectPanel()
+        self.extractPanel.text.setText('Select album cover extract directory.')
         vLayout = QVBoxLayout()
         vLayout.setContentsMargins(10,0,10,0)
         vLayout.addWidget(self.importPanel)
+        vLayout.addWidget(self.extractPanel)
         vLayout.setStretchFactor(self.importPanel, 0)
+        vLayout.setStretchFactor(self.extractPanel, 0)
         vLayout.addStretch(1)
         self.setLayout(vLayout)
 

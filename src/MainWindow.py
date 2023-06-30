@@ -5,6 +5,7 @@ from qframelesswindow import FramelessWindow
 from src.view.PlayerView import PlayerView
 from src.view.SettingsView import SettingsView
 from src.view.ImportView import ImportView
+from src.view.EqualizerView import EqualizerView
 from util.CustomControls import NavigationPanel, CustomTitleBar
 
 class MainWindow(FramelessWindow):
@@ -17,14 +18,11 @@ class MainWindow(FramelessWindow):
         self.initWindow()
         self.initGui()
 
-        # Folder imported -> database 
-        #self.settingsView.importPanel.folderChanged.connect(self.db.import_folder)
-
     def initWindow(self):
 
         self.resize(900, 700)
         self.setTitleBar(CustomTitleBar(self))
-        self.setWindowIcon(QIcon('icons/icon.svg'))
+        self.setWindowIcon(QIcon('resources/icons/icon.svg'))
         palette = self.palette()
         palette.setColor(self.backgroundRole(), QColor('#2F2F37')) #bg
         self.setPalette(palette)
@@ -39,12 +37,14 @@ class MainWindow(FramelessWindow):
         self.playerView =  PlayerView(self.controller)
         self.settingsView = SettingsView(self.controller)
         self.importView = ImportView(self.controller)
+        self.eqView = EqualizerView(self.controller)
         
         self.viewStack = QStackedWidget(self)
         self.viewStack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.viewStack.addWidget(self.playerView)
         self.viewStack.addWidget(self.importView)
         self.viewStack.addWidget(self.settingsView)
+        self.viewStack.addWidget(self.eqView)
 
 
         self.main_layout = QHBoxLayout(self)
@@ -57,6 +57,7 @@ class MainWindow(FramelessWindow):
         # Events
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
         self.navigationPanel.button2.clicked.connect(lambda: self.switchView(2))
+        self.navigationPanel.button4.clicked.connect(lambda: self.switchView(3))
         self.navigationPanel.button3.clicked.connect(lambda: self.switchView(1))
     
     def switchView(self, index):

@@ -115,12 +115,14 @@ class NavigationPanel(RoundEdgesWidget):
         # Buttons
         self.button1 = CircularButton('resources/icons/player.svg')
         self.button3 = CircularButton('resources/icons/folder-plus.svg')
+        self.button4 = CircularButton('resources/icons/eq.svg')
         self.button2 = CircularButton('resources/icons/settings.svg')
 
         # Layout 
         self.vBoxLayout = QVBoxLayout()
         self.vBoxLayout.addWidget(self.button1)
         self.vBoxLayout.addWidget(self.button3)
+        self.vBoxLayout.addWidget(self.button4)
         self.vBoxLayout.addStretch(1)
         self.vBoxLayout.addWidget(self.button2)
 
@@ -368,7 +370,7 @@ class AlbumPanel(RoundEdgesWidget):
                 """)
 
         def saveClick(self):
-            self.controller._requestAudio().extract_album_cover('extracted')
+            self.controller._requestAudio().extract_album_cover('resources/extracted')
         
         def update(self, audio):
             self.setAlbumCover(audio.get_album_cover(), 250)
@@ -442,7 +444,7 @@ class PathSelectPanel(RoundEdgesWidget):
 
     def initUi(self):
 
-        main_layout = QVBoxLayout()
+       
 
         icon = QIcon('resources/icons/folder.svg')
         pixmap = icon.pixmap(20, 20) 
@@ -464,24 +466,26 @@ class PathSelectPanel(RoundEdgesWidget):
         vbox.addWidget(self.pathLabel)
         vbox.addWidget(self.line)
 
-        # Top layout
+        # Left Layout
         top_layout = QHBoxLayout()
         top_layout.setSpacing(10)
         top_layout.addWidget(self.icon_label)
         top_layout.addWidget(self.text)
-        top_layout.addStretch(1)
-        top_layout.addWidget(self.button)
 
-        # Bottom Layout
+        # Middle Layout
         bottom_layout = QHBoxLayout()
+        horizontal_spacer = QSpacerItem(100, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        print(f"{self.text.width()} + {self.icon_label.width()}")
         bottom_layout.addStretch(1)
         bottom_layout.addLayout(vbox)
+        bottom_layout.addItem(horizontal_spacer)
         bottom_layout.addStretch(1)
 
+        main_layout = QHBoxLayout()
         main_layout.setSpacing(5)
         main_layout.addLayout(top_layout)
-        main_layout.addWidget(self.line)
         main_layout.addLayout(bottom_layout)
+        main_layout.addWidget(self.button)
         self.setLayout(main_layout)
 
         self.setStyleSheet("QLabel { color: #CCFFFFFF; }")
@@ -495,3 +499,37 @@ class PathSelectPanel(RoundEdgesWidget):
             self.path = folder_path
             self.folderChanged.emit(folder_path)
 
+class EqualizerPanel(RoundEdgesWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.init_ui()
+
+    def init_ui(self):
+        self.sliders = []
+
+        layout = QVBoxLayout()
+        frequencies = ["32 Hz", "64 Hz", "125 Hz", "250 Hz", "500 Hz", "1 kHz", "2 kHz", "4 kHz", "8 kHz", "16 kHz"]
+        for i in range(10):
+
+            label = QLabel(f"{frequencies[i]}")
+            label.setStyleSheet("QLabel { color: #E9E9EC; }")
+            slider = QSlider()
+            slider.setStyleSheet("QSlider { color: #E9E9EC; }")
+            slider.setOrientation(1)
+            slider.setRange(-50, 50)
+            slider.setValue(0)
+
+            layout.addWidget(label)
+            layout.addWidget(slider)
+
+            self.sliders.append(slider)
+
+        self.setLayout(layout)
+        
+    def get_equalizer_settings(self):
+        settings = []
+        for slider in self.sliders:
+            value = slider.value()
+            settings.append(value)
+        return settings

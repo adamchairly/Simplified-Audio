@@ -15,7 +15,6 @@ class Player(QObject):
 
         self.player = vlc.MediaPlayer(media_path)
         self.audio = MediaData(media_path)
-
         self.player.audio_set_volume(50)
 
         self.events = self.player.event_manager()
@@ -24,7 +23,11 @@ class Player(QObject):
         
         
         self.player.play()
-    
+
+        # Connect other sliders as needed
+    def set_controller(self, controller):
+        self.controller = controller
+
     def set_media(self, media_path):
         self.player.stop()
         self.player.set_mrl(media_path)
@@ -44,4 +47,13 @@ class Player(QObject):
             self.player.stop()
 
         self.mediaEnd.emit()
-        
+    
+    def apply_equalizer_settings(self, settings):
+        equalizer = vlc.AudioEqualizer()
+
+        # Set the gain for each band based on the settings
+        for i, gain in enumerate(settings):
+            equalizer.set_amp_at_index(gain, i)
+
+        # Apply the equalizer to the player
+        self.player.set_equalizer(equalizer)
