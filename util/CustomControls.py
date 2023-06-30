@@ -202,7 +202,6 @@ class VolumePanel(RoundEdgesWidget):
 
     def initUi(self):
 
-        # Color
         self.setAutoFillBackground(True)
         palette = self.palette()
         palette.setColor(QPalette.Background, QColor('#2F2F37'))
@@ -225,10 +224,11 @@ class VolumePanel(RoundEdgesWidget):
         self.setLayout(self.hLayout)
 
 class AlbumPanel(RoundEdgesWidget):
-        def __init__(self, audio):
+        def __init__(self, controller):
             super().__init__()
 
-            self.initUi(audio)
+            self.controller = controller
+            self.initUi(controller._requestAudio())
 
         def initUi(self, audio):
 
@@ -237,11 +237,15 @@ class AlbumPanel(RoundEdgesWidget):
             vLayout = QVBoxLayout()
 
             self.albumCover = QLabel()
-            self.setAlbumCover(audio.get_album_cover(), 250)
+            #self.setAlbumCover(audio.get_album_cover(), 250)
+            self.setDefaultCover(250)
 
             self.likeButton = CircularButton('icons/heart.svg')
             self.likeButton.clicked.connect(self.likeClick)
+
             self.extractButton = CircularButton('icons/save.svg')
+            self.extractButton.clicked.connect(self.saveClick)
+
             # Drop Shadow for cover
             shadow = QGraphicsDropShadowEffect()
             shadow.setBlurRadius(20)
@@ -275,6 +279,19 @@ class AlbumPanel(RoundEdgesWidget):
 
             pixmap = QPixmap()
             pixmap.loadFromData(data)
+            if pixmap.isNull():
+                fallback_path = 'icons/no_media.png'
+                pixmap.load(fallback_path)
+
+            pixmap = pixmap.scaled(ratio, ratio, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.albumCover.setPixmap(pixmap)
+            
+        
+        def setDefaultCover(self, ratio):
+            pixmap = QPixmap()
+
+            fallback_path = 'icons/no_media.png'
+            pixmap.load(fallback_path)
             pixmap = pixmap.scaled(ratio, ratio, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.albumCover.setPixmap(pixmap)
 
@@ -315,18 +332,23 @@ class AlbumPanel(RoundEdgesWidget):
                     background-color: #80717184;
                 }
                 """)
+
+        def saveClick(self):
+            self.controller._requestAudio().extract_album_cover('extracted')
+
             
 class MetaTablePanel(RoundEdgesWidget):
-    def __init__(self, audio):
+    def __init__(self, controller):
         super().__init__()
-        self.initUi(audio)
+        self.controller = controller
+        self.initUi(controller._requestAudio())
 
     def initUi(self, audio):
         # Create labels
-        self.artist_name_label = QLabel(f"Artist Name: {audio.artist}")
-        self.album_name_label = QLabel(f"Album Name: {audio.album}")
-        self.length_label = QLabel(f"Track Length: {audio.length}")
-        self.codec_label = QLabel(f"Track Codec: {audio.type}")
+        self.artist_name_label = QLabel(f"Artist Name: ")
+        self.album_name_label = QLabel(f"Album Name: ")
+        self.length_label = QLabel(f"Track Length: ")
+        self.codec_label = QLabel(f"Track Codec: ")
 
         self.artist_data = QLabel("Artist Data")
         self.album_data = QLabel("Album Data")
@@ -363,6 +385,12 @@ class MetaTablePanel(RoundEdgesWidget):
                 padding: 5px;
             }
         ''')
+
+        def updateInfo(self, audio):
+            self.artist_name_label = QLabel(f"Artist Name: {audio.artist}")
+            self.album_name_label = QLabel(f"Album Name: {audio.album}")
+            self.length_label = QLabel(f"Track Length: {audio.length}")
+            self.codec_label = QLabel(f"Track Codec: {audio.type}")
 
 class PathSelectPanel(RoundEdgesWidget):
 

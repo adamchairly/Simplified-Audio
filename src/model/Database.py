@@ -4,12 +4,14 @@ import os
 from src.model.MediaData import MediaData
 
 class MusicDatabase:
-    def __init__(self, db_name='music_player.db'):
+    def __init__(self, controller, db_name='music_player.db'):
+        
+        self.controller = controller
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
-        self._create_table()
+        self.create_table()
 
-    def _create_table(self):
+    def create_table(self):
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS Songs (
                 SongID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,6 +50,12 @@ class MusicDatabase:
         self.cursor.execute("""
             SELECT * FROM Songs WHERE FilePath = ?
         """, (file_path,))
+        return self.cursor.fetchone()
+    
+    def get_next_song(self, current_track_id):
+        self.cursor.execute("""
+            SELECT * FROM Songs WHERE SongID > ? ORDER BY SongID LIMIT 1
+        """, (current_track_id,))
         return self.cursor.fetchone()
 
     def close(self):

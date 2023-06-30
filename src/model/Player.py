@@ -1,17 +1,21 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 import vlc
 from vlc import EventType
+from src.model.MediaData import MediaData
 
 class Player(QObject):
     
     stateChanged = pyqtSignal()
-    positionChanged = pyqtSignal(float)
+    positionChanged = pyqtSignal()
     mediaChanged = pyqtSignal()
     mediaEnd = pyqtSignal()
 
     def __init__(self, media_path):
         super().__init__()
+
         self.player = vlc.MediaPlayer(media_path)
+        self.audio = MediaData(media_path)
+
         self.player.audio_set_volume(50)
 
         self.events = self.player.event_manager()
@@ -30,9 +34,7 @@ class Player(QObject):
 
     def position_changed(self, event, player):
 
-        position = self.player.get_position()
-        #Percentage of the track that has been played
-        self.positionChanged.emit(position * 100) 
+        self.positionChanged.emit() 
 
     def media_end(self, event, player):
 

@@ -1,16 +1,17 @@
 from PyQt5.QtWidgets import QFrame, QLabel,QVBoxLayout, QSizePolicy, QFileDialog
 from PyQt5.QtCore import pyqtSignal
 from util.CustomControls import PathSelectPanel
-from config import cfg
 
 class SettingsView(QFrame):
 
     # Fires when a new folder is added
     musicFoldersChanged = pyqtSignal(str)
 
-    def __init__(self, text: str, parent=None):
+    def __init__(self, controller, parent=None):
         super().__init__(parent= parent)
 
+        self.controller = controller
+        
         self.importPanel = PathSelectPanel()
         vLayout = QVBoxLayout()
         vLayout.setContentsMargins(10,0,10,0)

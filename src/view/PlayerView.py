@@ -13,6 +13,8 @@ class PlayerView(QFrame):
         self.controller = controller
 
         self.initUi()
+        
+        # Connecting events
         self.playerPanel.playButton.clicked.connect(self.play)
         self.playerPanel.leftButton.clicked.connect(self.left)
         self.playerPanel.rightButton.clicked.connect(self.right)
@@ -95,8 +97,8 @@ class PlayerView(QFrame):
     def initUi(self):
         self.playerPanel = PlayerPanel()
         self.volumePanel = VolumePanel()
-        self.albumPanel = AlbumPanel(self.controller._requestAudio())
-        self.metaPanel = MetaTablePanel(self.controller._requestAudio())
+        self.albumPanel = AlbumPanel(self.controller)
+        self.metaPanel = MetaTablePanel(self.controller)
         vboxLayout = QVBoxLayout()
         vboxLayout.setContentsMargins(10,0,10,0)
         vboxLayout.addWidget(self.albumPanel)

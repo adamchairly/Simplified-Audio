@@ -1,2 +1,4 @@
 /.venv
 /try.py
+music_player.db
+config/config.json
