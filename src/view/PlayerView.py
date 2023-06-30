@@ -14,23 +14,13 @@ class PlayerView(QFrame):
 
         self.initUi()
         
-        # Connecting events
-        self.playerPanel.playButton.clicked.connect(self.play)
-        self.playerPanel.leftButton.clicked.connect(self.left)
-        self.playerPanel.rightButton.clicked.connect(self.right)
-        self.playerPanel.slider.sliderMoved.connect(self.setPosition)
-
-        self.volumePanel.muteButton.clicked.connect(self.mute)
-        self.volumePanel.unmuteButton.clicked.connect(self.unMute)
-        self.volumePanel.volumeSlider.valueChanged.connect(self.setVolume)
-
     def play(self):
         if self.controller._isPlaying():
             self.controller._stopPlaying()
-            self.playerPanel.playButton.setIcon(QIcon('icons/play.svg'))
+            self.playerPanel.playButton.setIcon(QIcon('resources/icons/play.svg'))
         else:
             self.controller._startPlaying()
-            self.playerPanel.playButton.setIcon(QIcon('icons/pause.svg'))
+            self.playerPanel.playButton.setIcon(QIcon('resources/icons/pause.svg'))
 
     def left(self):
         #TODO
@@ -47,22 +37,22 @@ class PlayerView(QFrame):
         self.playerPanel.currentTime.setText(self.convert_seconds(int(current_time))) 
        
     def positionChanged(self, current_time, length):
+
         self.playerPanel.currentTime.setText(self.convert_seconds(int(current_time))) 
-
-        # Track time
-        self.playerPanel.trackTime.setText(self.convert_seconds(length / 1000))
-        # Update time slider 
-        percentage_played = (current_time / length) * 100
-        self.playerPanel.slider.setValue(int(percentage_played))
-
+        if length != 0: 
+            percentage_played = (current_time / length) * 100
+            self.playerPanel.slider.setValue(int(percentage_played))
+        if length == 0: self.playerPanel.slider.setValue(0)
 
     def convert_seconds(self, seconds):
         minutes, seconds = divmod(seconds, 60)
         return f"{int(minutes)}:{int(seconds):02d}"
         
-    def mediaChanged(self):
-        #TODO
-        pass
+    def mediaChanged(self, audio):
+        self.playerPanel.update(audio.length)
+        self.albumPanel.update(audio)
+        self.metaPanel.updateInfo(audio)
+        self.volumePanel.update()
 
     def mute(self):
         self.controller._muteAudio(True)
@@ -73,24 +63,12 @@ class PlayerView(QFrame):
         if self.volumePanel.volumeSlider.value() <= 90: self.volumePanel.volumeSlider.setValue(self.volumePanel.volumeSlider.value() + 10)
         
     def setVolume(self, volume):
-        icon_path = 'icons/volume2.svg' if volume > 50 else 'icons/volume1.svg' if volume > 20 else 'icons/volume0.svg'
+        icon_path = 'resources/icons/volume2.svg' if volume > 50 else 'resources/icons/volume1.svg' if volume > 20 else 'resources/icons/volume0.svg'
         self.volumePanel.unmuteButton.setIcon(QIcon(icon_path))
 
         self.controller._muteAudio(False)
         self.controller._setVolume(volume)
 
-    def mediaEnd(self):
-        self.playerPanel.currentTime.setText("0:00")
-        self.playerPanel.trackTime.setText("0:00")
-        self.playerPanel.slider.setDisabled(True)
-        self.playerPanel.slider.setValue(0)
-        self.playerPanel.leftButton.setDisabled(True)
-        self.playerPanel.rightButton.setDisabled(True)
-        self.playerPanel.playButton.setDisabled(True)
-
-    def _tryPopulate(self):
-        pass
-    
     def setController(self, controller):
         self.controller = controller
     
@@ -98,7 +76,8 @@ class PlayerView(QFrame):
         self.playerPanel = PlayerPanel()
         self.volumePanel = VolumePanel()
         self.albumPanel = AlbumPanel(self.controller)
-        self.metaPanel = MetaTablePanel(self.controller)
+        self.metaPanel = MetaTablePanel()
+
         vboxLayout = QVBoxLayout()
         vboxLayout.setContentsMargins(10,0,10,0)
         vboxLayout.addWidget(self.albumPanel)
@@ -109,4 +88,13 @@ class PlayerView(QFrame):
         vboxLayout.setStretchFactor(self.playerPanel, 0)
         vboxLayout.setStretchFactor(self.volumePanel,0)
         self.setLayout(vboxLayout)
+
+        self.playerPanel.playButton.clicked.connect(self.play)
+        self.playerPanel.leftButton.clicked.connect(self.left)
+        self.playerPanel.rightButton.clicked.connect(self.right)
+        self.playerPanel.slider.sliderMoved.connect(self.setPosition)
+
+        self.volumePanel.muteButton.clicked.connect(self.mute)
+        self.volumePanel.unmuteButton.clicked.connect(self.unMute)
+        self.volumePanel.volumeSlider.valueChanged.connect(self.setVolume)
         

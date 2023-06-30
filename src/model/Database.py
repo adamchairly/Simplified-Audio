@@ -25,14 +25,20 @@ class MusicDatabase:
         self.conn.commit()
     
     def add_song(self, title, artist, album_name, codec, file_path):
-        try:
+        self.cursor.execute("""
+            SELECT SongID FROM Songs WHERE FilePath = ? OR (Title = ? AND Artist = ? AND AlbumName = ?)
+        """, (file_path, title, artist, album_name))
+        existing_song = self.cursor.fetchone()
+        if existing_song:
+            print(f"Song at {file_path} is already in the database.")
+        else:
             self.cursor.execute("""
                 INSERT INTO Songs (Title, Artist, AlbumName, Codec, FilePath)
                 VALUES (?, ?, ?, ?, ?)
             """, (title, artist, album_name, codec, file_path))
             self.conn.commit()
-        except sqlite3.IntegrityError:
-            print(f"Song at {file_path} is already in the database.")
+
+
 
     def import_folder(self, folder_path):
         for root, dirs, files in os.walk(folder_path):
@@ -57,6 +63,14 @@ class MusicDatabase:
             SELECT * FROM Songs WHERE SongID > ? ORDER BY SongID LIMIT 1
         """, (current_track_id,))
         return self.cursor.fetchone()
+
+    def get_all_tracks(self, db_path):
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        cur.execute("SELECT Artist, AlbumName, Codec, FilePath FROM Songs")
+        rows = cur.fetchall()
+        conn.close()
+        return rows
 
     def close(self):
         self.conn.close()

@@ -1,15 +1,11 @@
-import sys
 from PyQt5.QtWidgets import QApplication,QHBoxLayout, QStackedWidget,QSizePolicy
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtCore import pyqtSignal
 from qframelesswindow import FramelessWindow
 
-from src.model.Player import Player
 from src.view.PlayerView import PlayerView
 from src.view.SettingsView import SettingsView
+from src.view.ImportView import ImportView
 from util.CustomControls import NavigationPanel, CustomTitleBar
-from src.model.Database import MusicDatabase
-from util import Controller
 
 class MainWindow(FramelessWindow):
 
@@ -42,11 +38,14 @@ class MainWindow(FramelessWindow):
         self.navigationPanel = NavigationPanel()
         self.playerView =  PlayerView(self.controller)
         self.settingsView = SettingsView(self.controller)
+        self.importView = ImportView(self.controller)
         
         self.viewStack = QStackedWidget(self)
         self.viewStack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.viewStack.addWidget(self.playerView)
+        self.viewStack.addWidget(self.importView)
         self.viewStack.addWidget(self.settingsView)
+
 
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setContentsMargins(10, self.titleBar.height(), 0, 10)
@@ -57,7 +56,8 @@ class MainWindow(FramelessWindow):
 
         # Events
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
-        self.navigationPanel.button2.clicked.connect(lambda: self.switchView(1))
+        self.navigationPanel.button2.clicked.connect(lambda: self.switchView(2))
+        self.navigationPanel.button3.clicked.connect(lambda: self.switchView(1))
     
     def switchView(self, index):
         self.viewStack.setCurrentIndex(index)

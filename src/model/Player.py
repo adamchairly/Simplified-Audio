@@ -26,11 +26,13 @@ class Player(QObject):
         self.player.play()
     
     def set_media(self, media_path):
-        #media = self.instance.media_new_path(media_path)
-        #self.player.set_media(media)
-        #elf.mediaChanged.emit()
-        #TODO
-        pass
+        self.player.stop()
+        self.player.set_mrl(media_path)
+        self.audio = MediaData(media_path)
+        self.player.play()
+        print(f"Artist: {self.audio.artist} Album: {self.audio.album} Length: {self.audio.length} Codec: {self.audio.type}")
+        
+        self.mediaChanged.emit()
 
     def position_changed(self, event, player):
 
@@ -43,19 +45,3 @@ class Player(QObject):
 
         self.mediaEnd.emit()
         
-        
-        
-
-'''     
-app = QApplication(sys.argv)
-
-player = Player('D:/Zene/test/The Caracal Project - Journée de merde. (Original Mix).wav')  # Replace with your audio file
-
-# Connect to the signals
-player.stateChanged.connect(lambda state: print('State changed:', state))
-player.positionChanged.connect(lambda position: print('Position changed:', position))
-player.durationChanged.connect(lambda duration: print('Duration changed:', duration))
-player.mediaChanged.connect(lambda: print('Media changed'))
-
-sys.exit(app.exec_())
-'''

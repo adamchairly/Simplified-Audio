@@ -45,26 +45,36 @@ class MediaData:
     def get_mp3_metadata(self, filepath):
         
         self.audio = MP3(filepath, ID3=ID3)
-        self.title = self.audio.get('artist', ['Unknown'])[0]
-        self.type = 'mp3'
-        self.length = self.convert_seconds(self.audio.info.length)
+        self.title = self.audio.get("TIT2", "No Title")[0]
         self.artist = self.audio.get('TPE1', ['Unknown'])[0]
         self.album = self.audio.get('TALB', ['Unknown'])[0]
-        self.has_cover = True if self.audio.tags.getall('APIC') else False
+        self.type = 'mp3'
+        self.length = self.convert_seconds(self.audio.info.length)
+        
+        self.has_cover = False
+        if self.audio.tags is not None:
+            for tag in self.audio.tags.values():
+                if tag.FrameID == 'APIC':
+                    self.has_cover = True
+                    break
 
     def get_flac_metadata(self, filepath):
 
         self.audio = FLAC(filepath)
-        self.type = 'flac'
-        self.length = self.convert_seconds(self.audio.info.length)
+        
+        self.title = self.audio.get("title", ["No Title"])[0]
         self.artist = self.audio.get('artist', ['Unknown'])[0]
         self.album = self.audio.get('album', ['Unknown'])[0]
+        self.type = 'flac'
+        self.length = self.convert_seconds(self.audio.info.length)
+        
         self.has_cover = len(self.audio.pictures) > 0
 
     def get_wav_metadata(self, filepath):
 
         self.audio = mutagen.File(filepath)
         self.length = self.convert_seconds(self.audio.info.length)
+        self.title = 'Unknown'
         self.artist = 'Unknown'
         self.album = 'Unknown'
         self.has_cover = False
@@ -73,16 +83,24 @@ class MediaData:
                 
         self.audio = MP4(filepath)
         self.type = 'm4a'
+        self.title = self.audio.get("\xa9nam", ["No Title"])[0]
         self.length = self.convert_seconds(self.audio.info.length)
         self.artist = self.audio.get('\xa9ART', ['Unknown'])[0]
         self.album = self.audio.get('\xa9alb', ['Unknown'])[0]
         self.has_cover = 'covr' in self.audio
 
     def extract_album_cover(self, output_path):
-    
+        
+        if self.audio is None:
+            print("No audio currently loaded.")
+            return
+
         artwork = self.get_album_cover()
         filename = os.path.splitext(os.path.basename(self.audio.filename))[0]
         output_file_path = os.path.join(output_path, f'{filename}.jpg')
+
+        # ensure output path exists
+        os.makedirs(output_path, exist_ok=True)
 
         if artwork is not None:
             try:
@@ -94,7 +112,9 @@ class MediaData:
                 print(f'Error processing album cover for {filename}: {str(e)}')
         else:
             print(f'No album cover found for {filename}')
-    
+
+
+
     def get_album_cover(self):
 
         artwork = None 
@@ -135,7 +155,6 @@ class MediaData:
                 continue
             track = MediaData(filepath)
             track.get_audio_metadata()
-            #TODO here add the track
 
 # Go through all files in the folder
 #for filename in os.listdir(folder):
