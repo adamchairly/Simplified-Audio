@@ -50,11 +50,16 @@ class Controller:
             file_path = song[5]
             self.window.importView.add_track(id, title, artist, album_name, codec, file_path)
 
+        self.window.messagePanel.show_notification(f'Imported from: {path}')
+
     def _requestLoadTrack(self, path):
         self.media.set_media(path)
         self.window.playerView.mediaChanged(self.media.audio)
 
-        print(f'Media set to {path}')
+        self.window.messagePanel.show_notification(f'Media set to {path}')
+    
+    def _log_message(self, message):
+        self.window.messagePanel.show_notification(message, 3000)
     
     def _applyEq(self, settings):
         self.media.apply_equalizer_settings(settings)
@@ -65,19 +70,20 @@ class Controller:
     def setWindow(self, window):
         self.window = window
         self._musicFolderChanged('music_player.db')
+        
         self.window.settingsView.importPanel.folderChanged.connect(self._musicFolderChanged)
+        self.window.settingsView.extractPanel.folderChanged.connect(self._log_message)
 
     def setDB(self, db):
         self.db = db
 
     def mediaEnd(self):
         self.window.playerView.playerPanel.mediaEnd()
-        pass
-        #TODO db->next
     
     def setMedia(self, mediaPlayer):
         self.media = mediaPlayer
         self.media.positionChanged.connect(self.positionChange)
         self.media.mediaEnd.connect(self.mediaEnd)
+        
     
    

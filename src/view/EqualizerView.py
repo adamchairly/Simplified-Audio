@@ -1,21 +1,9 @@
 # coding:utf-8
-from PyQt5.QtWidgets import QVBoxLayout, QScrollArea, QTableWidget, QHeaderView, QTableWidgetItem, QAbstractItemView, QFrame, QStyle
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QIcon, QPalette, QColor
+from PyQt5.QtWidgets import QVBoxLayout, QFrame
+from PyQt5.QtGui import QIcon, QPainter
+from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis,QValueAxis
+from PyQt5.QtCore import Qt
 from util.CustomControls import EqualizerPanel, CircularButton
-
-from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainter
-
-
-from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainter
-
-from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis, QValueAxis
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainter
 
 class EqualizerView(QFrame):
     def __init__(self, controller):
@@ -72,6 +60,7 @@ class EqualizerView(QFrame):
     def _on_apply_button_clicked(self):
         settings = self.eqPanel.get_equalizer_settings()
         self.controller._applyEq(settings)
+        self.controller._log_message("Equalizer applied.")
 
     def paintEvent(self, event):
         super().paintEvent(event)

@@ -1,19 +1,21 @@
 
 import os
 import mutagen
+from PyQt5.QtCore import pyqtSignal, QObject
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, APIC
+from mutagen.id3 import ID3
 from mutagen.flac import FLAC
 from mutagen.mp4 import MP4
 from PIL import Image
 import io
 
-# Define the folder
-#folder = 'D:/Zene/test/album'
+class MediaData(QObject):
 
-class MediaData:    
+    errorOccured = pyqtSignal(str)
+
     def __init__(self, filepath):
-
+        QObject.__init__(self)
+        
         self.filepath = filepath
         self.title = 'Unknown'
         self.audio = None
@@ -40,7 +42,7 @@ class MediaData:
             elif file_extension == '.m4a':
                 self.get_m4a_metadata(self.filepath)
         except Exception as e:
-            print(f"Error processing file: {self.filepath}, error: {e}")
+            self.errorOccured.emit(str(f'Error processing file: {self.filepath}, error: {e}'))
              
     def get_mp3_metadata(self, filepath):
         
@@ -92,14 +94,13 @@ class MediaData:
     def extract_album_cover(self, output_path):
         
         if self.audio is None:
-            print("No audio currently loaded.")
+            self.errorOccured.emit(str('No audio currently loaded.'))
             return
 
         artwork = self.get_album_cover()
         filename = os.path.splitext(os.path.basename(self.audio.filename))[0]
         output_file_path = os.path.join(output_path, f'{filename}.jpg')
 
-        # ensure output path exists
         os.makedirs(output_path, exist_ok=True)
 
         if artwork is not None:
@@ -107,43 +108,24 @@ class MediaData:
                 with Image.open(io.BytesIO(artwork)) as img:
                     img.thumbnail((800, 800))
                     img.save(output_file_path, 'JPEG', optimize=True, quality=100)
-                print(f'Saved album cover for {filename}')
+                self.errorOccured.emit(f'Saved album cover for {filename}')
             except Exception as e:
-                print(f'Error processing album cover for {filename}: {str(e)}')
+                self.errorOccured.emit(f'Error processing album cover for {filename}: {str(e)}')
         else:
-            print(f'No album cover found for {filename}')
-
+            self.errorOccured.emit(f'No album cover found for {filename}')
 
 
     def get_album_cover(self):
 
-        artwork = None 
-
-        if self.has_cover and self.type =='m4a':
-            artwork = self.audio['covr'][0]
-
+        if self.has_cover and self.type == 'm4a':
+            return self.audio['covr'][0]
         elif self.has_cover and self.type == 'mp3':
-            for tag in self.audio.tags.values():
-                if tag.FrameID == 'APIC':
-                    artwork = tag.data
-                    break
-
+            return next((tag.data for tag in self.audio.tags.values() if tag.FrameID == 'APIC'), None)
         elif self.has_cover and self.type == 'flac':
-            for picture in self.audio.pictures:
-                if picture.type == 3:
-                    artwork = picture.data
-                    break
-                   
-        if artwork is not None: return artwork
-
-    def __eq__(self, other):
-        if not isinstance(other, MediaData):
-            return False
-        if self.filepath == other.filepath:
-            return True
-        return object.__eq__(self, other)
+            return next((picture.data for picture in self.audio.pictures if picture.type == 3), None)
     
     def convert_seconds(self, seconds):
+
         minutes, seconds = divmod(seconds, 60)
         return f"{int(minutes)}:{int(seconds):02d}"
     
@@ -151,16 +133,6 @@ class MediaData:
 
         for filename in os.listdir(folder):
             filepath = os.path.join(folder, filename)
-            if not os.path.isfile(filepath):
-                continue
-            track = MediaData(filepath)
-            track.get_audio_metadata()
-
-# Go through all files in the folder
-#for filename in os.listdir(folder):
-    #filepath = os.path.join(folder, filename)
-    #if not os.path.isfile(filepath):
-       # continue
-    #audio = Audio(filepath)
-    #audio.get_audio_metadata()
-    #audio.extract_album_cover(folder)
+            if os.path.isfile(filepath):
+                track = MediaData(filepath)
+                track.get_audio_metadata()

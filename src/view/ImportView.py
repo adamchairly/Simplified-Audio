@@ -66,10 +66,11 @@ class ImportView(QFrame):
         self.table = QTableWidget()
         self.table.verticalHeader().setVisible(False)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setHorizontalHeaderLabels(["ID", "Title","Artist", "Album", "Codec"])
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setColumnCount(6)
         self.table.hideColumn(5)
+        self.table.setHorizontalHeaderLabels(["ID", "Title","Artist", "Album", "Codec", "Path"])
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        
         self.table.cellClicked.connect(self.cell_clicked)
 
         self.scrollAreaLayout.addWidget(self.table)

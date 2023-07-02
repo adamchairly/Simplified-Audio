@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFrame, QLabel,QVBoxLayout, QSizePolicy, QFileDialog
 from PyQt5.QtCore import pyqtSignal
-from util.CustomControls import PathSelectPanel
+from util.CustomControls import PathSelectPanel, ExtractPanel
 
 class SettingsView(QFrame):
 
@@ -12,8 +12,8 @@ class SettingsView(QFrame):
         
     def initUi(self):
         self.importPanel = PathSelectPanel()
-        self.extractPanel = PathSelectPanel()
-        self.extractPanel.text.setText('Select album cover extract directory.')
+        self.extractPanel = ExtractPanel()
+        
         vLayout = QVBoxLayout()
         vLayout.setContentsMargins(10,0,10,0)
         vLayout.addWidget(self.importPanel)
@@ -22,6 +22,7 @@ class SettingsView(QFrame):
         vLayout.setStretchFactor(self.extractPanel, 0)
         vLayout.addStretch(1)
         self.setLayout(vLayout)
+    
 
 
         

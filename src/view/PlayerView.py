@@ -57,10 +57,12 @@ class PlayerView(QFrame):
     def mute(self):
         self.controller._muteAudio(True)
         self.volumePanel.volumeSlider.setSliderPosition(0)
+        self.controller._log_message("Audio muted!")
 
     def unMute(self):
         self.controller._muteAudio(False)
         if self.volumePanel.volumeSlider.value() <= 90: self.volumePanel.volumeSlider.setValue(self.volumePanel.volumeSlider.value() + 10)
+        self.controller._log_message("Audio unmuted!")
         
     def setVolume(self, volume):
         icon_path = 'resources/icons/volume2.svg' if volume > 50 else 'resources/icons/volume1.svg' if volume > 20 else 'resources/icons/volume0.svg'
@@ -68,6 +70,7 @@ class PlayerView(QFrame):
 
         self.controller._muteAudio(False)
         self.controller._setVolume(volume)
+        self.controller._log_message(f"Volume: {volume} %")
 
     def setController(self, controller):
         self.controller = controller
@@ -79,7 +82,7 @@ class PlayerView(QFrame):
         self.metaPanel = MetaTablePanel()
 
         vboxLayout = QVBoxLayout()
-        vboxLayout.setContentsMargins(10,0,10,0)
+        vboxLayout.setContentsMargins(10,0,0,0)
         vboxLayout.addWidget(self.albumPanel)
         vboxLayout.addWidget(self.metaPanel)
         vboxLayout.addWidget(self.volumePanel)

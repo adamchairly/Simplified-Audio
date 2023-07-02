@@ -1,12 +1,11 @@
-from PyQt5.QtWidgets import QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QFrame, QFileDialog
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QFrame, QFileDialog, QWidget
 from PyQt5.QtGui import QPainterPath, QPainter, QPixmap, QIcon, QColor, QRegion, QPalette
 from qframelesswindow import StandardTitleBar
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QLabel
 from qfluentwidgets import *
 from qfluentwidgets import FluentIcon as FIF
-from PyQt5.QtCore import Qt, QStandardPaths
+from PyQt5.QtCore import Qt, QStandardPaths, QTimer
 from PyQt5.QtWidgets import QWidget, QLabel, QFrame
 
 class CircularButton(QPushButton):
@@ -210,7 +209,7 @@ class PlayerPanel(RoundEdgesWidget):
 
     def update(self, length):
         self.currentTime.setText("0:00")
-        self.trackTime.setText(length)
+        self.trackTime.setText(str(length))
         self.slider.setDisabled(False)
         self.slider.setValue(0)
         self.leftButton.setDisabled(False)
@@ -325,7 +324,10 @@ class AlbumPanel(RoundEdgesWidget):
         def likeClick(self):
             if self.likeButton.tagged:
                 self.default_like()
-            else: self.track_liked()
+                self.controller._log_message('Track unliked.')
+            else: 
+                self.track_liked()
+                self.controller._log_message('Track liked.')
             
         def track_liked(self):
             self.likeButton.tagged = not self.likeButton.tagged
@@ -370,7 +372,8 @@ class AlbumPanel(RoundEdgesWidget):
                 """)
 
         def saveClick(self):
-            self.controller._requestAudio().extract_album_cover('resources/extracted')
+            self.controller._requestAudio().extract_album_cover(self.controller.window.settingsView.extractPanel.path)
+            self.controller._log_message(f'Album cover extracted to: {self.controller.window.settingsView.extractPanel.path}')
         
         def update(self, audio):
             self.setAlbumCover(audio.get_album_cover(), 250)
@@ -439,12 +442,10 @@ class PathSelectPanel(RoundEdgesWidget):
 
     def __init__(self):
         super().__init__()
-        self.path = ''
+        self.path = 'resources\extracted'
         self.initUi()
 
     def initUi(self):
-
-       
 
         icon = QIcon('resources/icons/folder.svg')
         pixmap = icon.pixmap(20, 20) 
@@ -497,7 +498,20 @@ class PathSelectPanel(RoundEdgesWidget):
         if folder_path:
             self.pathLabel.setText(f'Folder: {folder_path}')
             self.path = folder_path
-            self.folderChanged.emit(folder_path)
+
+            self.folderChanged.emit(f'Imported music from: {self.path}')
+    
+class ExtractPanel(PathSelectPanel):
+   
+    def _onClick(self):
+            options = QFileDialog.Options()
+            options |= QFileDialog.DontUseNativeDialog
+            folder_path = QFileDialog.getExistingDirectory(self,"Select Folder", "", options=options)
+            if folder_path:
+                self.pathLabel.setText(f'Folder: {folder_path}')
+                self.path = folder_path
+
+                self.folderChanged.emit(f'Extract folder changed to: {self.path}')
 
 class EqualizerPanel(RoundEdgesWidget):
     def __init__(self):
@@ -533,3 +547,22 @@ class EqualizerPanel(RoundEdgesWidget):
             value = slider.value()
             settings.append(value)
         return settings
+    
+class Notification(RoundEdgesWidget):
+
+    def __init__(self, message):
+        super().__init__()
+        vlayout = QVBoxLayout()
+        self.label = QLabel("")
+        self.setStyleSheet("color: #E9E9EC")
+        vlayout.addWidget(self.label)
+        
+        self.setLayout(vlayout)
+        self.show_notification(message)
+
+    def clear_message(self):
+        self.label.setText('')
+
+    def show_notification(self, message, duration=3000):
+        self.label.setText(message) 
+        QTimer.singleShot(duration, self.clear_message)
