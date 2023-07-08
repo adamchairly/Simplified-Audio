@@ -20,9 +20,10 @@ class MainWindow(FramelessWindow):
 
     def initWindow(self):
 
-        self.resize(900, 700)
         self.setTitleBar(CustomTitleBar(self))
         self.setWindowIcon(QIcon('resources/icons/icon.svg'))
+        self.setMinimumSize(900,700)
+
         palette = self.palette()
         palette.setColor(self.backgroundRole(), QColor('#2F2F37')) #bg
         self.setPalette(palette)

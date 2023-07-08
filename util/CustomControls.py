@@ -12,29 +12,7 @@ class CircularButton(QPushButton):
     def __init__(self, icon):
         super().__init__()
         self.tagged = False
-        self.initUI()
         self.setIcon(QIcon(icon))
-        
-    def initUI(self):
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: #717184;  
-                border-radius: 25px; 
-                min-width: 50px; 
-                max-width: 50px; 
-                min-height: 50px; 
-                max-height: 50px;
-            }
-            QPushButton:hover {
-                background-color: #B3717184;
-            }
-            QPushButton:pressed {
-                background-color: #80717184;
-            }
-            QPushButton:disabled {
-                background-color: #B3717184;
-            }
-            """)
         
 class RoundEdgesWidget(QWidget):
     def __init__(self):
@@ -70,39 +48,6 @@ class ModernSlider(QSlider):
 
     def __initUi(self):
         self.setOrientation(Qt.Horizontal)
-        height = 5
-
-        slider = f'''
-        QSlider {{
-            margin-top: {height+1}px;
-            margin-bottom: {height+1}px;
-        }}
-
-        QSlider::groove:horizontal {{
-            border: #2F2F37;
-            height: {height}px;
-            background: #E9E9EC; 
-            margin: {height // 4}px 0;
-        }}
-
-        QSlider::handle:horizontal {{
-            background: white;
-
-            border: {height} solid #2F2F37;
-            width: {height * 3};
-            margin: {height * 2 * -1} 0;
-            border-radius: {height * 2 + height // 2}px;
-        }}
-        QSlider::add-page:horizontal {{
-            background: #2F2F37;
-            height: {height}px;
-            margin: {height // 4}px 0;
-        }}
-        QSlider::handle:horizontal:disabled {{
-            background: #bbbbbb;
-        }}
-        '''
-        self.setStyleSheet(slider)
 
 class NavigationPanel(RoundEdgesWidget):
     def __init__(self):
@@ -131,6 +76,8 @@ class NavigationPanel(RoundEdgesWidget):
         palette.setColor(QPalette.Background, QColor('#545463'))
 
         self.setPalette(palette)
+
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.setLayout(self.vBoxLayout)
 
 class CustomTitleBar(StandardTitleBar):
@@ -172,14 +119,11 @@ class PlayerPanel(RoundEdgesWidget):
         # Slider
         self.slider = ModernSlider()
         self.slider.setRange(0, 100)
-        
         # Minute markers
         self.currentTime = QLabel('0:00')
-        self.currentTime.setStyleSheet('color: #E9E9EC;')
         self.currentTime.setFixedSize(25,10)
 
         self.trackTime = QLabel()
-        self.trackTime.setStyleSheet('color: #E9E9EC;')
         self.trackTime.setFixedSize(25,10)
         self.trackTime.setText('')
 
@@ -196,6 +140,7 @@ class PlayerPanel(RoundEdgesWidget):
         palette = self.palette()
         palette.setColor(QPalette.Background, QColor('#545463'))
         self.setPalette(palette)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setLayout(player_layout)
     
     def mediaEnd(self):
@@ -243,12 +188,17 @@ class VolumePanel(RoundEdgesWidget):
         self.hLayout.addWidget(self.unmuteButton)
         self.hLayout.addWidget(self.volumeSlider)
         self.hLayout.addWidget(self.muteButton)
+
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setLayout(self.hLayout)
 
     def update(self):
         self.volumeSlider.setValue(50)
 
 class AlbumPanel(RoundEdgesWidget):
+        
+        track_liked = pyqtSignal(bool)
+
         def __init__(self, controller):
             super().__init__()
 
@@ -281,10 +231,8 @@ class AlbumPanel(RoundEdgesWidget):
             shadow.setColor(QColor(0, 0, 0, 80)) 
             self.albumCover.setGraphicsEffect(shadow)
 
-            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            
-            self.spacer1 = QSpacerItem(20, 40, QSizePolicy.Expanding)
-            self.spacer2 = QSpacerItem(20, 40, QSizePolicy.Expanding)
+            self.spacer1 = QSpacerItem(20, 40, QSizePolicy.MinimumExpanding)
+            self.spacer2 = QSpacerItem(20, 40, QSizePolicy.MinimumExpanding)
 
             hLayout.addItem(self.spacer1)
             hLayout.addWidget(self.albumCover)
@@ -298,7 +246,7 @@ class AlbumPanel(RoundEdgesWidget):
             vLayout.setContentsMargins(0,0,0,20)
             vLayout.addLayout(hLayout)
             vLayout.addLayout(h2Layout)
-            
+            self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Preferred)
             self.setLayout(vLayout)
 
         def setAlbumCover(self, data, ratio):
@@ -316,22 +264,24 @@ class AlbumPanel(RoundEdgesWidget):
         def setDefaultCover(self, ratio):
             pixmap = QPixmap()
 
-            fallback_path = 'resources/icons/no_media.png'
+            fallback_path = 'resources/no_media.png'
             pixmap.load(fallback_path)
             pixmap = pixmap.scaled(ratio, ratio, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.albumCover.setPixmap(pixmap)
 
         def likeClick(self):
-            if self.likeButton.tagged:
-                self.default_like()
-                self.controller._log_message('Track unliked.')
-            else: 
-                self.track_liked()
-                self.controller._log_message('Track liked.')
-            
-        def track_liked(self):
             self.likeButton.tagged = not self.likeButton.tagged
 
+            if self.likeButton.tagged:
+                self.track_liked.emit(True)
+                self.set_liked()
+                self.controller._log_message('Track liked.')
+            else: 
+                self.track_liked.emit(False)
+                self.set_default()
+                self.controller._log_message('Track unliked.')
+            
+        def set_liked(self):
             self.likeButton.setStyleSheet(
                 """
                 QPushButton {
@@ -349,12 +299,9 @@ class AlbumPanel(RoundEdgesWidget):
                     background-color: #80B34467;
                 }
             """)
-
-        def default_like(self):
-            self.likeButton.tagged = not self.likeButton.tagged
-
-            self.likeButton.setStyleSheet(
-                """
+                
+        def set_default(self):
+            self.likeButton.setStyleSheet("""
                 QPushButton {
                     background-color: #717184;  
                     border-radius: 25px; 
@@ -370,14 +317,18 @@ class AlbumPanel(RoundEdgesWidget):
                     background-color: #80717184;
                 }
                 """)
-
         def saveClick(self):
             self.controller._requestAudio().extract_album_cover(self.controller.window.settingsView.extractPanel.path)
             self.controller._log_message(f'Album cover extracted to: {self.controller.window.settingsView.extractPanel.path}')
         
-        def update(self, audio):
+        def update(self, audio, value):
             self.setAlbumCover(audio.get_album_cover(), 250)
-            self.likeButton.tagged = False
+            if value:
+                self.set_liked()
+                self.likeButton.tagged = True
+            else: 
+                self.set_default()
+                self.likeButton.tagged = False
    
 class MetaTablePanel(RoundEdgesWidget):
     def __init__(self):
@@ -401,7 +352,6 @@ class MetaTablePanel(RoundEdgesWidget):
         self.separator = QFrame()
         self.separator.setFrameShape(QFrame.HLine)
         self.separator.setLineWidth(2)
-        self.separator.setStyleSheet("color: black")
 
         # Create layout and add widgets
         layout = QGridLayout()
@@ -418,16 +368,8 @@ class MetaTablePanel(RoundEdgesWidget):
         #layout.addWidget(self.length_data, 2, 2)
         #layout.addWidget(self.codec_data, 2, 3)
 
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setLayout(layout)
-
-        # Apply Styles
-        self.setStyleSheet('''
-            QLabel {
-                background-color: transparent;
-                color: #E9E9EC;
-                padding: 5px;
-            }
-        ''')
 
     def updateInfo(self, audio):
         self.track_title_label.setText(f"Track Title: {audio.title}")
@@ -446,13 +388,14 @@ class PathSelectPanel(RoundEdgesWidget):
         self.initUi()
 
     def initUi(self):
-
+        
         icon = QIcon('resources/icons/folder.svg')
         pixmap = icon.pixmap(20, 20) 
         self.icon_label = QLabel(self)
         self.icon_label.setPixmap(pixmap)
 
         self.text = QLabel('Import music folder', self)
+        self.text.setObjectName("PathSelectPanelLabel")
 
         self.button = CircularButton(QIcon('resources/icons/folder-plus.svg'))
         self.button.clicked.connect(self._onClick)
@@ -489,8 +432,6 @@ class PathSelectPanel(RoundEdgesWidget):
         main_layout.addWidget(self.button)
         self.setLayout(main_layout)
 
-        self.setStyleSheet("QLabel { color: #CCFFFFFF; }")
-
     def _onClick(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -499,10 +440,14 @@ class PathSelectPanel(RoundEdgesWidget):
             self.pathLabel.setText(f'Folder: {folder_path}')
             self.path = folder_path
 
-            self.folderChanged.emit(f'Imported music from: {self.path}')
+            self.folderChanged.emit(self.path)
     
 class ExtractPanel(PathSelectPanel):
-   
+    
+    def __init__(self):
+            super().__init__()
+            self.text.setText('Album cover extract folder:')
+
     def _onClick(self):
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
@@ -523,15 +468,16 @@ class EqualizerPanel(RoundEdgesWidget):
         self.sliders = []
 
         layout = QVBoxLayout()
-        frequencies = ["32 Hz", "64 Hz", "125 Hz", "250 Hz", "500 Hz", "1 kHz", "2 kHz", "4 kHz", "8 kHz", "16 kHz"]
-        for i in range(10):
+        frequencies = ["64 Hz", "125 Hz", "300 Hz", "800 Hz", "1.6 kHz", "3.2 kHz"]
+        for i in range(6):
 
             label = QLabel(f"{frequencies[i]}")
-            label.setStyleSheet("QLabel { color: #E9E9EC; }")
+            label.setObjectName("EqualizerLabel")
+
             slider = QSlider()
-            slider.setStyleSheet("QSlider { color: #E9E9EC; }")
+            slider.setObjectName("EqualizerSlider")
             slider.setOrientation(1)
-            slider.setRange(-50, 50)
+            slider.setRange(-6, 6)
             slider.setValue(0)
 
             layout.addWidget(label)
@@ -552,9 +498,10 @@ class Notification(RoundEdgesWidget):
 
     def __init__(self, message):
         super().__init__()
+        self.setObjectName("NotificationWidget")
+
         vlayout = QVBoxLayout()
         self.label = QLabel("")
-        self.setStyleSheet("color: #E9E9EC")
         vlayout.addWidget(self.label)
         
         self.setLayout(vlayout)
@@ -566,3 +513,4 @@ class Notification(RoundEdgesWidget):
     def show_notification(self, message, duration=3000):
         self.label.setText(message) 
         QTimer.singleShot(duration, self.clear_message)
+

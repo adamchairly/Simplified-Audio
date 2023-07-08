@@ -1,6 +1,6 @@
 # coding:utf-8
 from PyQt5.QtWidgets import QVBoxLayout, QFrame
-from PyQt5.QtGui import QIcon, QPainter
+from PyQt5.QtGui import QIcon, QPainter, QBrush, QColor
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis,QValueAxis
 from PyQt5.QtCore import Qt
 from util.CustomControls import EqualizerPanel, CircularButton
@@ -24,28 +24,29 @@ class EqualizerView(QFrame):
 
         # Add a line series for the spectrum
         self.series = QLineSeries()
-        self.chart.addSeries(self.series)
+
+        # Create a value axis for the y-axis
+        self.axisY = QValueAxis()
+        self.axisY.setRange(-6, 6)
+        #self.axisY.setTickCount(11)
+        self.chart.addAxis(self.axisY, Qt.AlignLeft)
 
         # Create a category axis for the frequency labels
         self.axisX = QBarCategoryAxis()
         self.chart.addAxis(self.axisX, Qt.AlignBottom)
-        self.series.attachAxis(self.axisX)
 
-        # Create a value axis for the y-axis
-        self.axisY = QValueAxis()
-        self.chart.addAxis(self.axisY, Qt.AlignLeft)
+        # Now we add the series to the chart and attach the axes
+        self.chart.addSeries(self.series)
+        self.series.attachAxis(self.axisX)
         self.series.attachAxis(self.axisY)
 
         self.chart_view = QChartView(self.chart)
         self.chart_view.setRenderHint(QPainter.Antialiasing)
+        self.chart_view.setStyleSheet("background: transparent;")
 
         # Set the minimum height and width for the chart view
-        self.chart_view.setMinimumHeight(200)
+        self.chart_view.setMinimumHeight(150)
         self.chart_view.setMinimumWidth(500)
-
-        # Adjust the y-axis range and tick count
-        self.axisY.setRange(-50, 50)
-        self.axisY.setTickCount(11)
 
         vLayout.addWidget(self.chart_view, stretch=1)
         vLayout.addWidget(self.eqPanel, stretch=0)
@@ -59,6 +60,7 @@ class EqualizerView(QFrame):
 
     def _on_apply_button_clicked(self):
         settings = self.eqPanel.get_equalizer_settings()
+        print(settings)
         self.controller._applyEq(settings)
         self.controller._log_message("Equalizer applied.")
 
@@ -68,13 +70,13 @@ class EqualizerView(QFrame):
 
     def update_spectrum(self):
         settings = self.eqPanel.get_equalizer_settings()
-        frequencies = ["32 Hz", "64 Hz", "125 Hz", "250 Hz", "500 Hz", "1 kHz", "2 kHz", "4 kHz", "8 kHz", "16 kHz"]
+        frequencies = ["64 Hz", "125 Hz", "300 Hz", "800 Hz", "1.6 kHz", "3.2 kHz"]
 
-        # Set the categories on the category axis
         self.axisX.clear()
         self.axisX.append(frequencies)
 
         self.series.clear()
+
         for i, gain in enumerate(settings):
             self.series.append(i, gain)
 

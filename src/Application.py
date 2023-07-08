@@ -10,6 +10,7 @@ class Application(QApplication):
 
     def __init__(self, argv):
         QApplication.__init__(self, argv)
+        self._setQss()
 
         self.controller = Controller()
 
@@ -24,3 +25,10 @@ class Application(QApplication):
         
         self.window.show()
         sys.exit(self.exec_())
+    
+    def _setQss(self):
+        try:
+            with open('styles/dark.qss', 'r') as file:
+                self.setStyleSheet(file.read())
+        except FileNotFoundError:
+            print("QSS file not found.")

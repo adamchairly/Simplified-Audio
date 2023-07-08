@@ -48,9 +48,9 @@ class PlayerView(QFrame):
         minutes, seconds = divmod(seconds, 60)
         return f"{int(minutes)}:{int(seconds):02d}"
         
-    def mediaChanged(self, audio):
+    def mediaChanged(self, audio, value):
         self.playerPanel.update(audio.length)
-        self.albumPanel.update(audio)
+        self.albumPanel.update(audio, value)
         self.metaPanel.updateInfo(audio)
         self.volumePanel.update()
 

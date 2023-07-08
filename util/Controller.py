@@ -48,13 +48,15 @@ class Controller:
             album_name = song[3]
             codec = song[4]
             file_path = song[5]
-            self.window.importView.add_track(id, title, artist, album_name, codec, file_path)
+            liked = song[6]
+            self.window.importView.add_track(id, title, artist, album_name, codec, file_path, liked)
 
         self.window.messagePanel.show_notification(f'Imported from: {path}')
 
     def _requestLoadTrack(self, path):
         self.media.set_media(path)
-        self.window.playerView.mediaChanged(self.media.audio)
+        self._setVolume(50)
+        self.window.playerView.mediaChanged(self.media.audio, self.db.get_like_state(path))
 
         self.window.messagePanel.show_notification(f'Media set to {path}')
     
@@ -63,6 +65,9 @@ class Controller:
     
     def _applyEq(self, settings):
         self.media.apply_equalizer_settings(settings)
+
+    def _track_liked(self, value):
+        self.db.like_song(self.media.audio.filepath)
 
     def positionChange(self):
         self.window.playerView.positionChanged(self.media.player.get_time() / 1000, self.media.player.get_length() / 1000)
@@ -73,6 +78,7 @@ class Controller:
         
         self.window.settingsView.importPanel.folderChanged.connect(self._musicFolderChanged)
         self.window.settingsView.extractPanel.folderChanged.connect(self._log_message)
+        self.window.playerView.albumPanel.track_liked.connect(self._track_liked)
 
     def setDB(self, db):
         self.db = db
@@ -84,6 +90,7 @@ class Controller:
         self.media = mediaPlayer
         self.media.positionChanged.connect(self.positionChange)
         self.media.mediaEnd.connect(self.mediaEnd)
+        
         
     
    

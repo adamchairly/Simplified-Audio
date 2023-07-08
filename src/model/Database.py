@@ -19,12 +19,13 @@ class MusicDatabase:
                 Artist TEXT,
                 AlbumName TEXT,
                 Codec TEXT,
-                FilePath TEXT UNIQUE
+                FilePath TEXT UNIQUE,
+                Liked INTEGER DEFAULT 0
             )
         """)
         self.conn.commit()
     
-    def add_song(self, title, artist, album_name, codec, file_path):
+    def add_song(self, title, artist, album_name, codec, file_path, liked):
         self.cursor.execute("""
             SELECT SongID FROM Songs WHERE FilePath = ? OR (Title = ? AND Artist = ? AND AlbumName = ?)
         """, (file_path, title, artist, album_name))
@@ -33,9 +34,9 @@ class MusicDatabase:
             print(f"Song at {file_path} is already in the database.")
         else:
             self.cursor.execute("""
-                INSERT INTO Songs (Title, Artist, AlbumName, Codec, FilePath)
-                VALUES (?, ?, ?, ?, ?)
-            """, (title, artist, album_name, codec, file_path))
+                INSERT INTO Songs (Title, Artist, AlbumName, Codec, FilePath, Liked)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (title, artist, album_name, codec, file_path, liked))
             self.conn.commit()
 
 
@@ -50,7 +51,7 @@ class MusicDatabase:
                     artist = media_data.artist
                     album_name = media_data.album
                     codec = media_data.type
-                    self.add_song(title, artist, album_name, codec, file_path)
+                    self.add_song(title, artist, album_name, codec, file_path, liked = 0)
 
     def get_song_by_path(self, file_path):
         self.cursor.execute("""
@@ -58,6 +59,33 @@ class MusicDatabase:
         """, (file_path,))
         return self.cursor.fetchone()
     
+    def like_song(self, file_path):
+
+        self.cursor.execute("""
+            SELECT Liked FROM Songs WHERE FilePath = ?
+        """, (file_path,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            current_liked_status = result[0]
+            new_liked_status = 0 if current_liked_status == 1 else 1
+            self.cursor.execute("""
+                UPDATE Songs SET Liked = ? WHERE FilePath = ?
+            """, (new_liked_status, file_path))
+            self.conn.commit()
+        else:
+            print(f"No song found at {file_path}.")
+    
+    def get_like_state(self, file_path):
+        self.cursor.execute("""
+            SELECT Liked FROM Songs WHERE FilePath = ?
+        """, (file_path,))
+        
+        result = self.cursor.fetchone()
+        if result is None:
+            return False
+        else:
+            return result[0] == 1
+
     def get_next_song(self, current_track_id):
         self.cursor.execute("""
             SELECT * FROM Songs WHERE SongID > ? ORDER BY SongID LIMIT 1

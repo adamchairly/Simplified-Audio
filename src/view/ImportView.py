@@ -14,7 +14,7 @@ class ImportView(QFrame):
         self._initUi()
         self._setQss()
 
-    def add_track(self, id, title, artist, album, codec, path):
+    def add_track(self, id, title, artist, album, codec, path, liked):
 
         row = self.table.rowCount()
         self.table.insertRow(row)
@@ -25,6 +25,7 @@ class ImportView(QFrame):
         self.table.setItem(row, 3, QTableWidgetItem(album))
         self.table.setItem(row, 4, QTableWidgetItem(codec))
         self.table.setItem(row, 5, QTableWidgetItem(path))
+        self.table.setItem(row, 6, QTableWidgetItem(liked))
 
     def cell_clicked(self, row, column):
         path_item = self.table.item(row, 5)
@@ -66,8 +67,9 @@ class ImportView(QFrame):
         self.table = QTableWidget()
         self.table.verticalHeader().setVisible(False)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(7)
         self.table.hideColumn(5)
+        self.table.hideColumn(6)
         self.table.setHorizontalHeaderLabels(["ID", "Title","Artist", "Album", "Codec", "Path"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
