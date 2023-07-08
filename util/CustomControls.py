@@ -58,14 +58,16 @@ class NavigationPanel(RoundEdgesWidget):
 
         # Buttons
         self.button1 = CircularButton('resources/icons/player.svg')
-        self.button3 = CircularButton('resources/icons/folder-plus.svg')
-        self.button4 = CircularButton('resources/icons/eq.svg')
+        self.button3 = CircularButton('resources/icons/folder.svg')
+        self.button4 = CircularButton('resources/icons/mixer.svg')
+        self.button5 = CircularButton('resources/icons/heart.svg')
         self.button2 = CircularButton('resources/icons/settings.svg')
 
         # Layout 
         self.vBoxLayout = QVBoxLayout()
         self.vBoxLayout.addWidget(self.button1)
         self.vBoxLayout.addWidget(self.button3)
+        self.vBoxLayout.addWidget(self.button5)
         self.vBoxLayout.addWidget(self.button4)
         self.vBoxLayout.addStretch(1)
         self.vBoxLayout.addWidget(self.button2)

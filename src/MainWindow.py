@@ -6,6 +6,7 @@ from src.view.PlayerView import PlayerView
 from src.view.SettingsView import SettingsView
 from src.view.ImportView import ImportView
 from src.view.EqualizerView import EqualizerView
+from src.view.LikedView import LikedView
 from util.CustomControls import NavigationPanel, CustomTitleBar
 from util.CustomControls import Notification
 
@@ -39,6 +40,7 @@ class MainWindow(FramelessWindow):
         self.settingsView = SettingsView(self.controller)
         self.importView = ImportView(self.controller)
         self.eqView = EqualizerView(self.controller)
+        self.likedView = LikedView(self.controller)
         self.messagePanel = Notification('Welcome to Simplified Audio!')
 
         self.viewStack = QStackedWidget(self)
@@ -47,6 +49,7 @@ class MainWindow(FramelessWindow):
         self.viewStack.addWidget(self.importView)
         self.viewStack.addWidget(self.settingsView)
         self.viewStack.addWidget(self.eqView)
+        self.viewStack.addWidget(self.likedView)
 
         
         self.upper_layout = QHBoxLayout()
@@ -65,6 +68,7 @@ class MainWindow(FramelessWindow):
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
         self.navigationPanel.button2.clicked.connect(lambda: self.switchView(2))
         self.navigationPanel.button4.clicked.connect(lambda: self.switchView(3))
+        self.navigationPanel.button5.clicked.connect(lambda: self.switchView(4))
         self.navigationPanel.button3.clicked.connect(lambda: self.switchView(1))
     
     def switchView(self, index):

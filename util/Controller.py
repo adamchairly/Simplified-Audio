@@ -52,6 +52,26 @@ class Controller:
             self.window.importView.add_track(id, title, artist, album_name, codec, file_path, liked)
 
         self.window.messagePanel.show_notification(f'Imported from: {path}')
+    
+    def _populate_liked(self):
+
+        self.db.cursor.execute("SELECT * FROM Songs")
+        all_songs = self.db.cursor.fetchall()
+
+        self.window.likedView.table.clearContents()
+        self.window.likedView.table.setRowCount(0)
+
+        for song in all_songs:
+            id = song[0]
+            title = song[1]
+            artist = song[2]
+            album_name = song[3]
+            codec = song[4]
+            file_path = song[5]
+            liked = song[6]
+
+            if liked: self.window.likedView.add_track(id, title, artist, album_name, codec, file_path, liked)
+            print(f'Added liked song: {title}')
 
     def _requestLoadTrack(self, path):
         self.media.set_media(path)
@@ -68,6 +88,7 @@ class Controller:
 
     def _track_liked(self, value):
         self.db.like_song(self.media.audio.filepath)
+        self._populate_liked()
 
     def positionChange(self):
         self.window.playerView.positionChanged(self.media.player.get_time() / 1000, self.media.player.get_length() / 1000)
@@ -75,7 +96,8 @@ class Controller:
     def setWindow(self, window):
         self.window = window
         self._musicFolderChanged('music_player.db')
-        
+        self._populate_liked()
+
         self.window.settingsView.importPanel.folderChanged.connect(self._musicFolderChanged)
         self.window.settingsView.extractPanel.folderChanged.connect(self._log_message)
         self.window.playerView.albumPanel.track_liked.connect(self._track_liked)
