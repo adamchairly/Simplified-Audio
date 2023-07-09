@@ -86,18 +86,55 @@ class MusicDatabase:
         else:
             return result[0] == 1
 
-    def get_next_song(self, current_track_id):
+    def get_next_song(self, current_track_path):
         self.cursor.execute("""
-            SELECT * FROM Songs WHERE SongID > ? ORDER BY SongID LIMIT 1
-        """, (current_track_id,))
-        return self.cursor.fetchone()
+            SELECT SongID FROM Songs WHERE FilePath = ?
+        """, (current_track_path,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            current_track_id = result[0]
+        else:
+            return None
 
-    def get_all_tracks(self, db_path):
-        conn = sqlite3.connect(db_path)
-        cur = conn.cursor()
-        cur.execute("SELECT Artist, AlbumName, Codec, FilePath FROM Songs")
-        rows = cur.fetchall()
-        conn.close()
+        self.cursor.execute("""
+            SELECT FilePath FROM Songs WHERE SongID > ? ORDER BY SongID LIMIT 1
+        """, (current_track_id,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            return result[0]
+        else:
+            return None
+        
+    def get_previous_song(self, current_track_path):
+        self.cursor.execute("""
+            SELECT SongID FROM Songs WHERE FilePath = ?
+        """, (current_track_path,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            current_track_id = result[0]
+        else:
+            return None
+
+        self.cursor.execute("""
+            SELECT FilePath FROM Songs WHERE SongID < ? ORDER BY SongID DESC LIMIT 1
+        """, (current_track_id,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            return result[0]
+        else:
+            return None 
+        
+    def get_like_state(self, path):
+        self.cursor.execute("""
+            SELECT Liked FROM Songs WHERE FilePath = ?
+        """, (path,))
+
+        result = self.cursor.fetchone()
+        return result is not None and result[0] == 1
+    
+    def get_all_tracks(self):
+        self.cursor.execute("SELECT * FROM Songs")
+        rows = self.cursor.fetchall()
         return rows
 
     def close(self):

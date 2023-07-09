@@ -23,12 +23,10 @@ class PlayerView(QFrame):
             self.playerPanel.playButton.setIcon(QIcon('resources/icons/pause.svg'))
 
     def left(self):
-        #TODO
-        pass
+        self.controller._get_previous_song()
 
     def right(self):
-        #TODO
-        pass
+        self.controller._get_next_song()
 
     def setPosition(self, position):
 

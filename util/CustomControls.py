@@ -12,6 +12,7 @@ class CircularButton(QPushButton):
     def __init__(self, icon):
         super().__init__()
         self.tagged = False
+        self.setObjectName("CircularButton")
         self.setIcon(QIcon(icon))
         
 class RoundEdgesWidget(QWidget):
@@ -256,7 +257,7 @@ class AlbumPanel(RoundEdgesWidget):
             pixmap = QPixmap()
             pixmap.loadFromData(data)
             if pixmap.isNull():
-                fallback_path = 'resources/icons/no_media.png'
+                fallback_path = 'resources/no_media.png'
                 pixmap.load(fallback_path)
 
             pixmap = pixmap.scaled(ratio, ratio, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -265,7 +266,6 @@ class AlbumPanel(RoundEdgesWidget):
         
         def setDefaultCover(self, ratio):
             pixmap = QPixmap()
-
             fallback_path = 'resources/no_media.png'
             pixmap.load(fallback_path)
             pixmap = pixmap.scaled(ratio, ratio, Qt.KeepAspectRatio, Qt.SmoothTransformation)

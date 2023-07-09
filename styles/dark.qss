@@ -1,5 +1,5 @@
 /* CircularButton */
-QPushButton {
+CircularButton {
     background-color: #717184;  
     border-radius: 25px; 
     min-width: 50px; 
@@ -7,13 +7,13 @@ QPushButton {
     min-height: 50px; 
     max-height: 50px;
 }
-QPushButton:hover {
+CircularButton:hover {
     background-color: #B3717184;
 }
-QPushButton:pressed {
+CircularButton:pressed {
     background-color: #80717184;
 }
-QPushButton:disabled {
+CircularButton:disabled {
     background-color: #B3717184;
 }
 

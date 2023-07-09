@@ -55,8 +55,7 @@ class Controller:
     
     def _populate_liked(self):
 
-        self.db.cursor.execute("SELECT * FROM Songs")
-        all_songs = self.db.cursor.fetchall()
+        all_songs = self.db.get_all_tracks()
 
         self.window.likedView.table.clearContents()
         self.window.likedView.table.setRowCount(0)
@@ -71,7 +70,6 @@ class Controller:
             liked = song[6]
 
             if liked: self.window.likedView.add_track(id, title, artist, album_name, codec, file_path, liked)
-            print(f'Added liked song: {title}')
 
     def _requestLoadTrack(self, path):
         self.media.set_media(path)
@@ -80,6 +78,14 @@ class Controller:
 
         self.window.messagePanel.show_notification(f'Media set to {path}')
     
+    def _get_next_song(self):
+        self.media.set_media(self.db.get_next_song(self.media.audio.filepath))
+        self.window.playerView.mediaChanged(self.media.audio, self.db.get_like_state(self.media.audio.filepath))
+    
+    def _get_previous_song(self):
+        self.media.set_media(self.db.get_previous_song(self.media.audio.filepath))
+        self.window.playerView.mediaChanged(self.media.audio, self.db.get_like_state(self.media.audio.filepath))
+
     def _log_message(self, message):
         self.window.messagePanel.show_notification(message, 3000)
     
