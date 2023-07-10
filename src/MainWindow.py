@@ -1,26 +1,25 @@
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication,QHBoxLayout, QStackedWidget,QSizePolicy, QVBoxLayout,QMainWindow, QWidget
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
-
 from src.view.PlayerView import PlayerView
 from src.view.SettingsView import SettingsView
 from src.view.ImportView import ImportView
 from src.view.EqualizerView import EqualizerView
 from src.view.LikedView import LikedView
-from src.util.CustomControls import NavigationPanel, CustomTitleBar
+from src.util.CustomControls import NavigationPanel
 from src.util.CustomControls import Notification, Theme, RoundEdgesWidget
+from src.util.CustomTitleBar import FramelessWindow, CustomTitleBar
 
-import sys
-import os
 
-class MainWindow(QMainWindow):
+
+class MainWindow(FramelessWindow):
 
     def __init__(self, controller):
         super(MainWindow, self).__init__()
 
         self.controller = controller
         self.theme = Theme.MAIN_BLACK
+
         self.initWindow()
         self.initGui()
         self._set_default_theme()
@@ -42,8 +41,8 @@ class MainWindow(QMainWindow):
 
     def initWindow(self):
 
-        self.setMenuWidget(CustomTitleBar(self))
-        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.title_bar = CustomTitleBar(self)
+        self.setWindowFlags(Qt.FramelessWindowHint)
         self.setWindowIcon(QIcon('resources/icons/icon.svg'))
 
         self.setMinimumSize(900,700)
@@ -86,13 +85,20 @@ class MainWindow(QMainWindow):
         self.upper_layout.setSpacing(0)
     
         self.vertical_main = QVBoxLayout()
-        self.vertical_main.setContentsMargins(10, 10 ,10, 10)
+        self.vertical_main.setContentsMargins(10, 0 ,10, 10)
         self.vertical_main.addLayout(self.upper_layout)
         self.vertical_main.addWidget(self.messagePanel)
         self.vertical_main.setSpacing(10)
 
+        self.vertical_bar = QVBoxLayout()
+        self.vertical_bar.setContentsMargins(0, 0, 0, 0)
+        self.vertical_bar.setSpacing(0)
+        self.vertical_bar.addWidget(self.title_bar)
+        self.vertical_bar.addLayout(self.vertical_main)
+
         central_widget = QWidget()
-        central_widget.setLayout(self.vertical_main)
+        central_widget.setLayout(self.vertical_bar)
+        central_widget.setContentsMargins(0,0,0,0)
         self.setCentralWidget(central_widget)
 
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
@@ -138,6 +144,7 @@ class MainWindow(QMainWindow):
                     child.switch_theme()
 
         self.update()
+    
 
     
 

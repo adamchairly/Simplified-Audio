@@ -31,7 +31,6 @@ class MediaData(QObject):
 
         file_extension = os.path.splitext(self.filepath)[1].lower()
 
-        print(file_extension)
         try:
             if file_extension == '.mp3':
                 self.get_mp3_metadata(self.filepath)

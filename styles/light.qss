@@ -52,6 +52,12 @@ QLabel {
     padding: 5px;
 }
 
+QLabel#titleLabel {
+    background-color: transparent;
+    color: #E9E9EC;
+    padding: 5px;
+}
+
 QWidget#NotificationWidget { 
     color: #ff242424;
 }
@@ -60,3 +66,9 @@ QWidget#ScrollArea {
     background-color: #e1e1e1;
 }
 
+QPushButton#titlebutton {
+    background-color: transparent;
+} 
+QPushButton#titlebutton:hover { 
+    background-color: #7ee1e1e1; 
+}

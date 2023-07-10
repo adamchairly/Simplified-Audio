@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, 
                              QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QFrame, QFileDialog, QWidget)
 from PyQt5.QtGui import QPainterPath, QPainter, QPixmap, QIcon, QColor, QRegion, QPalette
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QPoint
 from qframelesswindow import StandardTitleBar
 from QSwitchControl import SwitchControl
 from enum import Enum
@@ -88,39 +88,7 @@ class NavigationPanel(RoundEdgesWidget):
 
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.setLayout(self.vBoxLayout)
-
-class CustomStandardBar(StandardTitleBar):
-
-    def __init__(self, parent):
-        super().__init__(parent)
     
-    def set_title_color(self, color):
-        self.titleLabel.setStyleSheet("""
-        QLabel{
-            background: transparent;
-            font: 13px 'Segoe UI';
-            padding: 0 4px;
-            color: %(color)s;
-        }
-    """ % {'color': color})
-    
-class CustomTitleBar(CustomStandardBar):
-
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.minBtn.setHoverBackgroundColor(QColor('#33717184'))
-        self.minBtn.setHoverColor(QColor('White'))
-        self.minBtn.setNormalColor(QColor('Grey'))
-
-        self.closeBtn.setNormalColor(QColor('Grey'))
-        self.closeBtn.setHoverColor(QColor('White'))
-
-        self.maxBtn.setNormalColor(QColor('Grey'))
-        self.maxBtn.setHoverColor(QColor('White'))
-        self.maxBtn.setHoverBackgroundColor(QColor('#33717184'))
-        self.setTitle('Simplified Audio')  
-
 class PlayerPanel(RoundEdgesWidget):
     def __init__(self):
         super().__init__()

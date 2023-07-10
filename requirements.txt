@@ -1,11 +1,9 @@
 mutagen==1.46.0
 Pillow==10.0.0
 PyQt5==5.15.9
-PyQt5-Frameless-Window==0.2.8
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.12.1
 PyQtChart==5.15.6
 PyQtChart-Qt5==5.15.2
 python-vlc==3.0.18122
-pywin32==306
 QSwitchControl==1.0.4

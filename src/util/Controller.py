@@ -121,7 +121,6 @@ class Controller:
         if value:
             self._add_liked_track(self.media.audio.filepath)
         else: 
-            print('Song should be removed after like')
             self._removed_liked_track(self.media.audio.filepath)
 
 
