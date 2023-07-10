@@ -2,4 +2,4 @@
 /try.py
 music_player.db
 config/config.json
-__pycache__/
+**/__pycache__/
