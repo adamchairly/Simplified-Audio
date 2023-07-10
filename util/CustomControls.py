@@ -7,33 +7,46 @@ from qfluentwidgets import *
 from qfluentwidgets import FluentIcon as FIF
 from PyQt5.QtCore import Qt, QStandardPaths, QTimer
 from PyQt5.QtWidgets import QWidget, QLabel, QFrame
+from QSwitchControl import SwitchControl
+from qframelesswindow import TitleBar
+
+class Theme(Enum):
+    BLACK = QColor('#545463')
+    WHITE = QColor('#e1e1e1')
+    MAIN_WHITE = QColor('#b0b0b0')
+    MAIN_BLACK = QColor('#2F2F37')
 
 class CircularButton(QPushButton):
+
     def __init__(self, icon):
         super().__init__()
         self.tagged = False
         self.setObjectName("CircularButton")
+
         self.setIcon(QIcon(icon))
-        
+
 class RoundEdgesWidget(QWidget):
     def __init__(self):
         super().__init__()
+        self.setObjectName('RoundEdgesWidget')
+        self.theme = Theme.BLACK
+
+    def switch_theme(self):
+        if self.theme == Theme.BLACK:
+            self.theme = Theme.WHITE
+        elif self.theme == Theme.WHITE:
+            self.theme = Theme.BLACK
+        else:
+            raise ValueError(f'Unsupported theme: {self.theme}')
+        
+        self.update()
 
     def paintEvent(self, event):
-        path = QPainterPath()
-        path.addRoundedRect(0, 0, self.width(), self.height(), 20, 20)
-        
-        pixmap = QPixmap(self.size())
-        pixmap.fill(Qt.transparent)
-
-        painter = QPainter(pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)  # Enable anti-aliasing
-        painter.setBrush(QColor('#545463'))  # Set the background color
-        painter.drawPath(path)
-        painter.end()
-
         painter = QPainter(self)
-        painter.drawPixmap(self.rect(), pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(self.theme.value)
+        painter.setPen(Qt.NoPen)
+        painter.drawRoundedRect(self.rect(), 20, 20)
 
     def resizeEvent(self, event):
         path = QPainterPath()
@@ -57,14 +70,12 @@ class NavigationPanel(RoundEdgesWidget):
     
     def initUi(self):
 
-        # Buttons
         self.button1 = CircularButton('resources/icons/player.svg')
         self.button3 = CircularButton('resources/icons/folder.svg')
         self.button4 = CircularButton('resources/icons/mixer.svg')
         self.button5 = CircularButton('resources/icons/heart.svg')
         self.button2 = CircularButton('resources/icons/settings.svg')
 
-        # Layout 
         self.vBoxLayout = QVBoxLayout()
         self.vBoxLayout.addWidget(self.button1)
         self.vBoxLayout.addWidget(self.button3)
@@ -73,8 +84,6 @@ class NavigationPanel(RoundEdgesWidget):
         self.vBoxLayout.addStretch(1)
         self.vBoxLayout.addWidget(self.button2)
 
-        # Widget
-        self.setAutoFillBackground(True)
         palette = self.palette()
         palette.setColor(QPalette.Background, QColor('#545463'))
 
@@ -83,7 +92,22 @@ class NavigationPanel(RoundEdgesWidget):
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
         self.setLayout(self.vBoxLayout)
 
-class CustomTitleBar(StandardTitleBar):
+class CustomStandardBar(StandardTitleBar):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+    
+    def set_title_color(self, color):
+        self.titleLabel.setStyleSheet("""
+        QLabel{
+            background: transparent;
+            font: 13px 'Segoe UI';
+            padding: 0 4px;
+            color: %(color)s;
+        }
+    """ % {'color': color})
+    
+class CustomTitleBar(CustomStandardBar):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -122,12 +146,14 @@ class PlayerPanel(RoundEdgesWidget):
         # Slider
         self.slider = ModernSlider()
         self.slider.setRange(0, 100)
+
         # Minute markers
-        self.currentTime = QLabel('0:00')
-        self.currentTime.setFixedSize(25,10)
+        self.currentTime = QLabel()
+        #self.currentTime.setFixedSize(30,10)
+        self.currentTime.setText('0:00')
 
         self.trackTime = QLabel()
-        self.trackTime.setFixedSize(25,10)
+        #self.trackTime.setFixedSize(30,10)
         self.trackTime.setText('')
 
         # Layout
@@ -140,9 +166,6 @@ class PlayerPanel(RoundEdgesWidget):
         player_layout.addWidget(self.slider)
         player_layout.addWidget(self.trackTime)
         
-        palette = self.palette()
-        palette.setColor(QPalette.Background, QColor('#545463'))
-        self.setPalette(palette)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setLayout(player_layout)
     
@@ -155,9 +178,10 @@ class PlayerPanel(RoundEdgesWidget):
         self.playButton.setDisabled(True)
         self.playButton.setIcon(QIcon('resources/icons/play.svg'))
 
-    def update(self, length):
+    def update_ui(self, length):
         self.currentTime.setText("0:00")
         self.trackTime.setText(str(length))
+        print(str(length))
         self.slider.setDisabled(False)
         self.slider.setValue(0)
         self.leftButton.setDisabled(False)
@@ -172,7 +196,7 @@ class VolumePanel(RoundEdgesWidget):
 
     def initUi(self):
 
-        self.setAutoFillBackground(True)
+        self.setAutoFillBackground(False)
         palette = self.palette()
         palette.setColor(QPalette.Background, QColor('#2F2F37'))
         self.setPalette(palette)
@@ -195,7 +219,7 @@ class VolumePanel(RoundEdgesWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setLayout(self.hLayout)
 
-    def update(self):
+    def update_ui(self):
         self.volumeSlider.setValue(50)
 
 class AlbumPanel(RoundEdgesWidget):
@@ -219,13 +243,14 @@ class AlbumPanel(RoundEdgesWidget):
             else: self.setDefaultCover(250)
 
             self.likeButton = CircularButton('resources/icons/heart.svg')
+            self.likeButton.setEnabled(False)
             self.likeButton.clicked.connect(self.likeClick)
             self.likeButton.tagged = False
 
             self.extractButton = CircularButton('resources/icons/save.svg')
+            self.extractButton.setEnabled(False)
             self.extractButton.clicked.connect(self.saveClick)
 
-            # Drop Shadow for cover
             shadow = QGraphicsDropShadowEffect()
             shadow.setBlurRadius(20)
             shadow.setXOffset(5)
@@ -263,8 +288,8 @@ class AlbumPanel(RoundEdgesWidget):
             pixmap = pixmap.scaled(ratio, ratio, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.albumCover.setPixmap(pixmap)
             
-        
         def setDefaultCover(self, ratio):
+
             pixmap = QPixmap()
             fallback_path = 'resources/no_media.png'
             pixmap.load(fallback_path)
@@ -319,11 +344,12 @@ class AlbumPanel(RoundEdgesWidget):
                     background-color: #80717184;
                 }
                 """)
+            
         def saveClick(self):
             self.controller._requestAudio().extract_album_cover(self.controller.window.settingsView.extractPanel.path)
             self.controller._log_message(f'Album cover extracted to: {self.controller.window.settingsView.extractPanel.path}')
         
-        def update(self, audio, value):
+        def update_ui(self, audio, value):
             self.setAlbumCover(audio.get_album_cover(), 250)
             if value:
                 self.set_liked()
@@ -338,7 +364,7 @@ class MetaTablePanel(RoundEdgesWidget):
         self.initUi()
 
     def initUi(self):
-        # Create labels
+
         self.track_title_label = QLabel(f"Track Title: ")
         self.artist_name_label = QLabel(f"Artist Name: ")
         self.album_name_label = QLabel(f"Album Name: ")
@@ -350,30 +376,22 @@ class MetaTablePanel(RoundEdgesWidget):
         self.length_data = QLabel("Length Data")
         self.codec_data = QLabel("Codec Data")
 
-        # Create separators
         self.separator = QFrame()
         self.separator.setFrameShape(QFrame.HLine)
         self.separator.setLineWidth(2)
 
-        # Create layout and add widgets
         layout = QGridLayout()
         layout.addWidget(self.track_title_label, 0, 0)
         layout.addWidget(self.artist_name_label, 0, 1)
         layout.addWidget(self.album_name_label, 0, 2)
         layout.addWidget(self.length_label, 0, 3)
         layout.addWidget(self.codec_label, 2, 0)
-
         layout.addWidget(self.separator, 1, 0, 1, 4)
-
-        #layout.addWidget(self.artist_data, 2, 0)
-        #layout.addWidget(self.album_data, 2, 1)
-        #layout.addWidget(self.length_data, 2, 2)
-        #layout.addWidget(self.codec_data, 2, 3)
 
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setLayout(layout)
 
-    def updateInfo(self, audio):
+    def update_ui(self, audio):
         self.track_title_label.setText(f"Track Title: {audio.title}")
         self.artist_name_label.setText(f"Artist Name: {audio.artist}")
         self.album_name_label.setText(f"Album Name: {audio.album}")
@@ -515,4 +533,32 @@ class Notification(RoundEdgesWidget):
     def show_notification(self, message, duration=3000):
         self.label.setText(message) 
         QTimer.singleShot(duration, self.clear_message)
+
+class SwitchPanel(RoundEdgesWidget):
+
+    theme_changed = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("SwitchPanel")
+
+        vLayout = QHBoxLayout()
+        self.text = QLabel('Change theme:')
+        self.mode_text = QLabel('Dark')
+        self.mode_text2 = QLabel('Light')
+        self.switchButton = SwitchControl(active_color= "#545463")
+        vLayout.addWidget(self.text)
+        vLayout.addStretch(1)
+        vLayout.addWidget(self.mode_text)
+        vLayout.addWidget(self.switchButton)
+        vLayout.addWidget(self.mode_text2)
+        self.setLayout(vLayout)
+
+        self.switchButton.toggled.connect(self.on_toggle)
+
+    def on_toggle(self, toggled):
+        if toggled: 
+            self.theme_changed.emit(1)
+        else: 
+            self.theme_changed.emit(0)
 

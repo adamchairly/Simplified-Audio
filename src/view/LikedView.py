@@ -1,13 +1,15 @@
 # coding:utf-8
-from PyQt5.QtWidgets import QVBoxLayout, QScrollArea, QTableWidget, QHeaderView, QTableWidgetItem, QAbstractItemView, QFrame
-from PyQt5.QtCore import pyqtSignal
 from src.view.ImportView import ImportView
 
 class LikedView(ImportView):
 
     def __init__(self, controller):
         super().__init__(controller)
-        self.controller = controller
-        self.table.hideColumn(5)
-        self.table.hideColumn(6)
-        self.table.hideColumn(7)
+
+    def remove_track(self, file_path):
+        for track_widget in self.trackWidgets:
+            if track_widget.path == file_path:
+                self.vlayout.removeWidget(track_widget)
+                track_widget.hide()
+                self.trackWidgets.remove(track_widget)
+                track_widget.deleteLater()

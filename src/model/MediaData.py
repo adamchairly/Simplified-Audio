@@ -1,4 +1,3 @@
-
 import os
 import mutagen
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -30,8 +29,9 @@ class MediaData(QObject):
 
     def get_audio_metadata(self):
 
-        file_extension = os.path.splitext(self.filepath)[1]
-
+        file_extension = os.path.splitext(self.filepath)[1].lower()
+        
+        print(file_extension)
         try:
             if file_extension == '.mp3':
                 self.get_mp3_metadata(self.filepath)
@@ -82,7 +82,8 @@ class MediaData(QObject):
         self.has_cover = False
 
     def get_m4a_metadata(self, filepath):
-                
+
+        print("found m4a")
         self.audio = MP4(filepath)
         self.type = 'm4a'
         self.title = self.audio.get("\xa9nam", ["No Title"])[0]
@@ -106,7 +107,7 @@ class MediaData(QObject):
         if artwork is not None:
             try:
                 with Image.open(io.BytesIO(artwork)) as img:
-                    img.thumbnail((800, 800))
+                    img.thumbnail((1280, 1280))
                     img.save(output_file_path, 'JPEG', optimize=True, quality=100)
                 self.errorOccured.emit(f'Saved album cover for {filename}')
             except Exception as e:

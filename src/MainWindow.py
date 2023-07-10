@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication,QHBoxLayout, QStackedWidget,QSizePolicy, QVBoxLayout
 from PyQt5.QtGui import QIcon, QColor
 from qframelesswindow import FramelessWindow
@@ -8,7 +9,7 @@ from src.view.ImportView import ImportView
 from src.view.EqualizerView import EqualizerView
 from src.view.LikedView import LikedView
 from util.CustomControls import NavigationPanel, CustomTitleBar
-from util.CustomControls import Notification
+from util.CustomControls import Notification, Theme, RoundEdgesWidget
 
 class MainWindow(FramelessWindow):
 
@@ -16,8 +17,25 @@ class MainWindow(FramelessWindow):
         super(MainWindow, self).__init__()
 
         self.controller = controller
+        self.theme = Theme.MAIN_BLACK
         self.initWindow()
         self.initGui()
+        self._set_default_theme()
+
+    def _set_theme_dark(self):
+
+        self.switch_theme()
+    
+    def _set_theme_light(self):
+
+        self.switch_theme()
+
+    def _set_default_theme(self):
+        try:
+            with open('styles/dark.qss', 'r') as file:
+                self.setStyleSheet(file.read())
+        except FileNotFoundError:
+            print("QSS file not found.")
 
     def initWindow(self):
 
@@ -26,21 +44,27 @@ class MainWindow(FramelessWindow):
         self.setMinimumSize(900,700)
 
         palette = self.palette()
-        palette.setColor(self.backgroundRole(), QColor('#2F2F37')) #bg
+        palette.setColor(self.backgroundRole(), self.theme.value) #bg
         self.setPalette(palette)
 
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
 
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        palette = self.palette()
+        palette.setColor(self.backgroundRole(), self.theme.value)
+        self.setPalette(palette)
+
     def initGui(self):
 
         self.navigationPanel = NavigationPanel()
+        self.likedView = LikedView(self.controller)
         self.playerView =  PlayerView(self.controller)
         self.settingsView = SettingsView(self.controller)
         self.importView = ImportView(self.controller)
         self.eqView = EqualizerView(self.controller)
-        self.likedView = LikedView(self.controller)
         self.messagePanel = Notification('Welcome to Simplified Audio!')
 
         self.viewStack = QStackedWidget(self)
@@ -73,4 +97,41 @@ class MainWindow(FramelessWindow):
     
     def switchView(self, index):
         self.viewStack.setCurrentIndex(index)
+
+    def switch_theme(self):
+
+        if self.theme == Theme.MAIN_BLACK:
+            self.theme = Theme.MAIN_WHITE
+            value = 'light'
+        elif self.theme == Theme.MAIN_WHITE:
+            self.theme = Theme.MAIN_BLACK
+            value = 'dark'
+        else:
+            raise ValueError(f'Unsupported theme: {self.theme}')
+        
+        try:
+            with open(f'styles/{value}.qss', 'r') as file:
+                self.setStyleSheet(file.read())
+        except FileNotFoundError:
+            print("QSS file not found.")
+
+        widgets = [
+            self.navigationPanel,
+            self.playerView,
+            self.settingsView,
+            self.importView,
+            self.eqView,
+            self.likedView,
+            self.messagePanel
+        ]
+        for widget in widgets:
+            if isinstance(widget, RoundEdgesWidget):
+                widget.switch_theme()  
+            else: 
+                for child in widget.findChildren(RoundEdgesWidget):
+                    child.switch_theme()
+
+        self.update()
+
+    
 

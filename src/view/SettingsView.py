@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QFrame, QLabel,QVBoxLayout, QSizePolicy, QFileDialog
 from PyQt5.QtCore import pyqtSignal
-from util.CustomControls import PathSelectPanel, ExtractPanel
+
+from util.CustomControls import PathSelectPanel, ExtractPanel, SwitchPanel
 
 class SettingsView(QFrame):
 
@@ -13,7 +14,8 @@ class SettingsView(QFrame):
     def initUi(self):
         self.importPanel = PathSelectPanel()
         self.extractPanel = ExtractPanel()
-        
+        self.switch_panel = SwitchPanel()
+
         vLayout = QVBoxLayout()
         vLayout.setContentsMargins(10,0,10,0)
         vLayout.addWidget(self.importPanel)
@@ -21,6 +23,7 @@ class SettingsView(QFrame):
         vLayout.setStretchFactor(self.importPanel, 0)
         vLayout.setStretchFactor(self.extractPanel, 0)
         vLayout.addStretch(1)
+        vLayout.addWidget(self.switch_panel)
         self.setLayout(vLayout)
     
 

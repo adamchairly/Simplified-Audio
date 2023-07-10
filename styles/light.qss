@@ -1,19 +1,66 @@
-Widget > QLabel {
-    font: 24px 'Segoe UI', 'Microsoft YaHei';
+QPushButton#CircularButton {
+    background-color: #52717184;  
+    border-radius: 25px; 
+    min-width: 50px; 
+    max-width: 50px; 
+    min-height: 50px; 
+    max-height: 50px;
+}
+QPushButton#CircularButton:hover {
+    background-color: #38717184;
+}
+QPushButton#CircularButton:pressed {
+    background-color: #8a717184;
+}
+QPushButton#CircularButton:disabled {
+    background-color: #21717184;
 }
 
-Widget {
-    border: 1px solid rgb(229, 229, 229);
-    border-right: none;
-    border-bottom: none;
-    border-top-left-radius: 10px;
-    background-color: rgb(249, 249, 249);
-}
-Window {
-    background-color: rgb(243, 243, 243);
+/* Slider */
+QSlider {
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
-main_window {
-    background-color: rgb(0,0,0)
-    color: rgb(0,0,0)
+QSlider::groove:horizontal {
+    border: #2F2F37;
+    height: 5px;
+    background: #81242424; 
+    margin: 1px 0;
 }
+
+QSlider::handle:horizontal {
+    background: #dadada;
+    border: 5px solid #ff46464d;
+    width: 15px;
+    margin: -10px 0;
+    border-radius: 12px;
+}
+
+QSlider::add-page:horizontal {
+    background: #b0b0b0;
+    height: 5px;
+    margin: 1px 0;
+}
+
+QSlider::handle:horizontal:disabled {
+    background: #dadada;
+}
+
+
+/* QLabel */
+QLabel {
+    background-color: transparent;
+    color: #ff242424;
+    padding: 5px;
+}
+
+/* Notification */
+QWidget#NotificationWidget { 
+    color: #ff242424;
+}
+
+QWidget#ScrollArea {
+    background-color: #e1e1e1;
+}
+

@@ -1,5 +1,4 @@
-/* CircularButton */
-CircularButton {
+QPushButton#CircularButton {
     background-color: #717184;  
     border-radius: 25px; 
     min-width: 50px; 
@@ -7,17 +6,16 @@ CircularButton {
     min-height: 50px; 
     max-height: 50px;
 }
-CircularButton:hover {
+QPushButton#CircularButton:hover {
     background-color: #B3717184;
 }
-CircularButton:pressed {
+QPushButton#CircularButton:pressed {
     background-color: #80717184;
 }
-CircularButton:disabled {
+QPushButton#CircularButton:disabled {
     background-color: #B3717184;
 }
 
-/* Slider */
 QSlider {
     margin-top: 6px;
     margin-bottom: 6px;
@@ -48,26 +46,12 @@ QSlider::handle:horizontal:disabled {
     background: #bbbbbb;
 }
 
-
-/* QLabel */
 QLabel {
     background-color: transparent;
     color: #E9E9EC;
     padding: 5px;
 }
 
-/* PathSelectPanel */
-PathSelectPanelLabel > QLabel { 
-    color: #CCFFFFFF; 
-}
-
-/* ExtractPanel */
-QLabel.ExtractPanelLabel { 
-    color: #E9E9EC; 
-}
-
-
-/* Notification */
-QWidget.NotificationWidget { 
-    color: #E9E9EC;
+QWidget#ScrollArea {
+    background-color: #545463;
 }

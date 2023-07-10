@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFrame, QVBoxLayout
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QIcon
 from src.model import MediaData, Player
-from util.CustomControls import PlayerPanel,VolumePanel, AlbumPanel, MetaTablePanel
+from util.CustomControls import PlayerPanel,VolumePanel, AlbumPanel, MetaTablePanel, RoundEdgesWidget
 import pythoncom
 
 class PlayerView(QFrame):
@@ -11,9 +11,8 @@ class PlayerView(QFrame):
     def __init__(self, controller, parent=None):
         super().__init__(parent= parent)
         self.controller = controller
-
         self.initUi()
-        
+
     def play(self):
         if self.controller._isPlaying():
             self.controller._stopPlaying()
@@ -30,8 +29,8 @@ class PlayerView(QFrame):
 
     def setPosition(self, position):
 
-        self.controller._setPosition(float(position / 100)) # VLC uses a 0.0-1.0 range
-        current_time = self.controller._requestPlayerTime() / 1000   # Current time in seconds
+        self.controller._setPosition(float(position / 100))
+        current_time = self.controller._requestPlayerTime() / 1000
         self.playerPanel.currentTime.setText(self.convert_seconds(int(current_time))) 
        
     def positionChanged(self, current_time, length):
@@ -47,10 +46,10 @@ class PlayerView(QFrame):
         return f"{int(minutes)}:{int(seconds):02d}"
         
     def mediaChanged(self, audio, value):
-        self.playerPanel.update(audio.length)
-        self.albumPanel.update(audio, value)
-        self.metaPanel.updateInfo(audio)
-        self.volumePanel.update()
+        self.playerPanel.update_ui(audio.length)
+        self.albumPanel.update_ui(audio, value)
+        self.metaPanel.update_ui(audio)
+        self.volumePanel.update_ui()
 
     def mute(self):
         self.controller._muteAudio(True)
@@ -99,3 +98,7 @@ class PlayerView(QFrame):
         self.volumePanel.unmuteButton.clicked.connect(self.unMute)
         self.volumePanel.volumeSlider.valueChanged.connect(self.setVolume)
         
+    def switch_theme(self):
+        for child in self.findChildren(RoundEdgesWidget):
+            child.switch_theme()
+    

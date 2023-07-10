@@ -4,9 +4,8 @@ import os
 from src.model.MediaData import MediaData
 
 class MusicDatabase:
-    def __init__(self, controller, db_name='music_player.db'):
+    def __init__(self, db_name='music_player.db'):
         
-        self.controller = controller
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
         self.create_table()
@@ -39,13 +38,12 @@ class MusicDatabase:
             """, (title, artist, album_name, codec, file_path, liked))
             self.conn.commit()
 
-
-
     def import_folder(self, folder_path):
         for root, dirs, files in os.walk(folder_path):
             for file in files:
-                if file.endswith((".mp3", ".wav", ".flac")):
+                if file.endswith((".mp3", ".wav", ".flac", ".m4a")):
                     file_path = os.path.join(root, file)
+                    file_path = os.path.normpath(file_path)
                     media_data = MediaData(file_path)
                     title = media_data.title
                     artist = media_data.artist
