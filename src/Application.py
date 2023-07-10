@@ -1,10 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from src.MainWindow import MainWindow
-from util.Controller import Controller
 from src.model.Database import MusicDatabase
 from src.model.Player import Player
-import tracemalloc
+from src.util.Controller import Controller
+
 
 class Application(QApplication):
 

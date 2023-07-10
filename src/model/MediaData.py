@@ -30,7 +30,7 @@ class MediaData(QObject):
     def get_audio_metadata(self):
 
         file_extension = os.path.splitext(self.filepath)[1].lower()
-        
+
         print(file_extension)
         try:
             if file_extension == '.mp3':
@@ -63,7 +63,6 @@ class MediaData(QObject):
     def get_flac_metadata(self, filepath):
 
         self.audio = FLAC(filepath)
-        
         self.title = self.audio.get("title", ["No Title"])[0]
         self.artist = self.audio.get('artist', ['Unknown'])[0]
         self.album = self.audio.get('album', ['Unknown'])[0]
@@ -83,7 +82,6 @@ class MediaData(QObject):
 
     def get_m4a_metadata(self, filepath):
 
-        print("found m4a")
         self.audio = MP4(filepath)
         self.type = 'm4a'
         self.title = self.audio.get("\xa9nam", ["No Title"])[0]

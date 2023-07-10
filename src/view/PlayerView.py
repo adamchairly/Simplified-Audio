@@ -1,10 +1,6 @@
-# coding:utf-8
 from PyQt5.QtWidgets import QFrame, QVBoxLayout
-from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QIcon
-from src.model import MediaData, Player
-from util.CustomControls import PlayerPanel,VolumePanel, AlbumPanel, MetaTablePanel, RoundEdgesWidget
-import pythoncom
+from ..util.CustomControls import PlayerPanel,VolumePanel, AlbumPanel, MetaTablePanel, RoundEdgesWidget
 
 class PlayerView(QFrame):
 

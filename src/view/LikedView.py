@@ -1,5 +1,5 @@
 # coding:utf-8
-from src.view.ImportView import ImportView
+from .ImportView import ImportView
 
 class LikedView(ImportView):
 

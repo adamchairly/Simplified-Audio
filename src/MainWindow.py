@@ -1,6 +1,6 @@
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication,QHBoxLayout, QStackedWidget,QSizePolicy, QVBoxLayout
-from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtGui import QIcon
 from qframelesswindow import FramelessWindow
 
 from src.view.PlayerView import PlayerView
@@ -8,8 +8,8 @@ from src.view.SettingsView import SettingsView
 from src.view.ImportView import ImportView
 from src.view.EqualizerView import EqualizerView
 from src.view.LikedView import LikedView
-from util.CustomControls import NavigationPanel, CustomTitleBar
-from util.CustomControls import Notification, Theme, RoundEdgesWidget
+from src.util.CustomControls import NavigationPanel, CustomTitleBar
+from src.util.CustomControls import Notification, Theme, RoundEdgesWidget
 
 class MainWindow(FramelessWindow):
 
@@ -65,7 +65,7 @@ class MainWindow(FramelessWindow):
         self.settingsView = SettingsView(self.controller)
         self.importView = ImportView(self.controller)
         self.eqView = EqualizerView(self.controller)
-        self.messagePanel = Notification('Welcome to Simplified Audio!')
+        self.messagePanel = Notification('Welcome!')
 
         self.viewStack = QStackedWidget(self)
         self.viewStack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -74,7 +74,6 @@ class MainWindow(FramelessWindow):
         self.viewStack.addWidget(self.settingsView)
         self.viewStack.addWidget(self.eqView)
         self.viewStack.addWidget(self.likedView)
-
         
         self.upper_layout = QHBoxLayout()
         self.upper_layout.addWidget(self.navigationPanel)
@@ -88,7 +87,6 @@ class MainWindow(FramelessWindow):
         self.vertical_main.setSpacing(10)
         self.setLayout(self.vertical_main)
 
-        # Events
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
         self.navigationPanel.button2.clicked.connect(lambda: self.switchView(2))
         self.navigationPanel.button4.clicked.connect(lambda: self.switchView(3))

@@ -1,7 +1,5 @@
-from PyQt5.QtWidgets import QFrame, QLabel,QVBoxLayout, QSizePolicy, QFileDialog
-from PyQt5.QtCore import pyqtSignal
-
-from util.CustomControls import PathSelectPanel, ExtractPanel, SwitchPanel
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
+from ..util.CustomControls import PathSelectPanel, ExtractPanel, SwitchPanel
 
 class SettingsView(QFrame):
 

@@ -28,18 +28,7 @@ class CircularButton(QPushButton):
 class RoundEdgesWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setObjectName('RoundEdgesWidget')
         self.theme = Theme.BLACK
-
-    def switch_theme(self):
-        if self.theme == Theme.BLACK:
-            self.theme = Theme.WHITE
-        elif self.theme == Theme.WHITE:
-            self.theme = Theme.BLACK
-        else:
-            raise ValueError(f'Unsupported theme: {self.theme}')
-        
-        self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -53,6 +42,16 @@ class RoundEdgesWidget(QWidget):
         path.addRoundedRect(0, 0, self.width(), self.height(), 20, 20)
         region = QRegion(path.toFillPolygon().toPolygon())
         self.setMask(region)
+    
+    def switch_theme(self):
+        if self.theme == Theme.BLACK:
+            self.theme = Theme.WHITE
+        elif self.theme == Theme.WHITE:
+            self.theme = Theme.BLACK
+        else:
+            raise ValueError(f'Unsupported theme: {self.theme}')
+        
+        self.update()
         
 class ModernSlider(QSlider):
 
@@ -312,7 +311,7 @@ class AlbumPanel(RoundEdgesWidget):
             self.likeButton.setStyleSheet(
                 """
                 QPushButton {
-                    background-color: #B34467;  
+                    background-color: #BFe80c5c;  
                     border-radius: 25px; 
                     min-width: 50px; 
                     max-width: 50px; 
@@ -330,7 +329,7 @@ class AlbumPanel(RoundEdgesWidget):
         def set_default(self):
             self.likeButton.setStyleSheet("""
                 QPushButton {
-                    background-color: #717184;  
+                    background-color: #B3e06089;  
                     border-radius: 25px; 
                     min-width: 50px; 
                     max-width: 50px; 
@@ -338,10 +337,10 @@ class AlbumPanel(RoundEdgesWidget):
                     max-height: 50px;
                 }
                 QPushButton:hover {
-                    background-color: #B3717184;
+                    background-color: #38717184;
                 }
                 QPushButton:pressed {
-                    background-color: #80717184;
+                    background-color: #38717184;
                 }
                 """)
             
@@ -561,4 +560,41 @@ class SwitchPanel(RoundEdgesWidget):
             self.theme_changed.emit(1)
         else: 
             self.theme_changed.emit(0)
+    
+class TrackWidget(QWidget):
+
+    trackSelected = pyqtSignal(str)
+
+    def __init__(self, data, title, artist, album, codec, path):
+        super().__init__()
+        self.setObjectName('TrackWidget')
+
+        self.coverArtLabel = QLabel(self)
+        pixmap = QPixmap()
+        pixmap.loadFromData(data)
+        if pixmap.isNull():
+            fallback_path = 'resources/no_media.png'
+            pixmap.load(fallback_path)
+
+        pixmap = pixmap.scaled(75, 75, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.coverArtLabel.setPixmap(pixmap)
+
+        self.titleLabel = QLabel(title[:20])
+        self.artistLabel = QLabel(artist[:20])
+        self.albumLabel = QLabel(album[:20])
+        self.codecLabel = QLabel(codec[:5])
+        self.path = path
+
+        self.layout = QHBoxLayout()
+        self.layout.setContentsMargins(0,0,0,5)
+        self.layout.addWidget(self.coverArtLabel)
+        self.layout.addWidget(self.titleLabel)
+        self.layout.addWidget(self.artistLabel)
+        self.layout.addWidget(self.albumLabel)
+        self.layout.addWidget(self.codecLabel)
+
+        self.setLayout(self.layout)
+
+    def mousePressEvent(self, event):
+        self.trackSelected.emit(self.path)
 

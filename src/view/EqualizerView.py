@@ -1,9 +1,9 @@
 # coding:utf-8
 from PyQt5.QtWidgets import QVBoxLayout, QFrame
-from PyQt5.QtGui import QIcon, QPainter, QBrush, QColor
+from PyQt5.QtGui import QIcon, QPainter
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis,QValueAxis
 from PyQt5.QtCore import Qt
-from util.CustomControls import EqualizerPanel, CircularButton
+from ..util.CustomControls import EqualizerPanel, CircularButton
 
 class EqualizerView(QFrame):
     def __init__(self, controller):
@@ -17,25 +17,19 @@ class EqualizerView(QFrame):
         vLayout = QVBoxLayout()
         vLayout.setContentsMargins(10, 0, 10, 0)
 
-        # Create the chart for spectrum visualization
         self.chart = QChart()
         self.chart.legend().hide()
         self.chart.setBackgroundVisible(False)
 
-        # Add a line series for the spectrum
         self.series = QLineSeries()
 
-        # Create a value axis for the y-axis
         self.axisY = QValueAxis()
         self.axisY.setRange(-6, 6)
-        #self.axisY.setTickCount(11)
         self.chart.addAxis(self.axisY, Qt.AlignLeft)
 
-        # Create a category axis for the frequency labels
         self.axisX = QBarCategoryAxis()
         self.chart.addAxis(self.axisX, Qt.AlignBottom)
 
-        # Now we add the series to the chart and attach the axes
         self.chart.addSeries(self.series)
         self.series.attachAxis(self.axisX)
         self.series.attachAxis(self.axisY)
@@ -44,7 +38,6 @@ class EqualizerView(QFrame):
         self.chart_view.setRenderHint(QPainter.Antialiasing)
         self.chart_view.setStyleSheet("background: transparent;")
 
-        # Set the minimum height and width for the chart view
         self.chart_view.setMinimumHeight(150)
         self.chart_view.setMinimumWidth(500)
 

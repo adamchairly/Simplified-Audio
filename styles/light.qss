@@ -16,7 +16,6 @@ QPushButton#CircularButton:disabled {
     background-color: #21717184;
 }
 
-/* Slider */
 QSlider {
     margin-top: 6px;
     margin-bottom: 6px;
@@ -47,15 +46,12 @@ QSlider::handle:horizontal:disabled {
     background: #dadada;
 }
 
-
-/* QLabel */
 QLabel {
     background-color: transparent;
     color: #ff242424;
     padding: 5px;
 }
 
-/* Notification */
 QWidget#NotificationWidget { 
     color: #ff242424;
 }
