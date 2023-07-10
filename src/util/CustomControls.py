@@ -319,7 +319,7 @@ class AlbumPanel(RoundEdgesWidget):
                     max-height: 50px;
                 }
                 QPushButton:hover {
-                    background-color: #B34467
+                    background-color: #66e80c5c
                 }
                 QPushButton:pressed {
                     background-color: #80B34467;
@@ -337,7 +337,7 @@ class AlbumPanel(RoundEdgesWidget):
                     max-height: 50px;
                 }
                 QPushButton:hover {
-                    background-color: #38717184;
+                    background-color: #66e06089;
                 }
                 QPushButton:pressed {
                     background-color: #38717184;
