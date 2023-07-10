@@ -1,4 +1,3 @@
-# coding:utf-8
 from PyQt5.QtWidgets import QVBoxLayout, QFrame
 from PyQt5.QtGui import QIcon, QPainter
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarCategoryAxis,QValueAxis
@@ -53,7 +52,6 @@ class EqualizerView(QFrame):
 
     def _on_apply_button_clicked(self):
         settings = self.eqPanel.get_equalizer_settings()
-        print(settings)
         self.controller._applyEq(settings)
         self.controller._log_message("Equalizer applied.")
 

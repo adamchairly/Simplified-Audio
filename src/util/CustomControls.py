@@ -1,14 +1,12 @@
-from PyQt5.QtWidgets import QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QFrame, QFileDialog, QWidget
+from PyQt5.QtWidgets import (QPushButton, QWidget, QSlider, QVBoxLayout, QLabel, QHBoxLayout, 
+                             QSizePolicy, QSpacerItem, QGraphicsDropShadowEffect, QGridLayout, QFrame, QFileDialog, QWidget)
 from PyQt5.QtGui import QPainterPath, QPainter, QPixmap, QIcon, QColor, QRegion, QPalette
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from qframelesswindow import StandardTitleBar
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QVBoxLayout, QLabel
-from qfluentwidgets import *
-from qfluentwidgets import FluentIcon as FIF
-from PyQt5.QtCore import Qt, QStandardPaths, QTimer
-from PyQt5.QtWidgets import QWidget, QLabel, QFrame
 from QSwitchControl import SwitchControl
-from qframelesswindow import TitleBar
+from enum import Enum
+import sys
+import os
 
 class Theme(Enum):
     BLACK = QColor('#545463')
@@ -129,9 +127,9 @@ class PlayerPanel(RoundEdgesWidget):
         self.initUi()
     
     def initUi(self):
-
+        
         # Play/Pause Button
-        self.playButton = CircularButton('resources/icons/play.svg')
+        self.playButton = CircularButton('resources/icons/player.svg')
         self.playButton.setEnabled(True)
 
         # Left Button
@@ -180,7 +178,6 @@ class PlayerPanel(RoundEdgesWidget):
     def update_ui(self, length):
         self.currentTime.setText("0:00")
         self.trackTime.setText(str(length))
-        print(str(length))
         self.slider.setDisabled(False)
         self.slider.setValue(0)
         self.leftButton.setDisabled(False)
@@ -438,7 +435,7 @@ class PathSelectPanel(RoundEdgesWidget):
         # Middle Layout
         bottom_layout = QHBoxLayout()
         horizontal_spacer = QSpacerItem(100, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        print(f"{self.text.width()} + {self.icon_label.width()}")
+
         bottom_layout.addStretch(1)
         bottom_layout.addLayout(vbox)
         bottom_layout.addItem(horizontal_spacer)
@@ -597,4 +594,3 @@ class TrackWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.trackSelected.emit(self.path)
-

@@ -1,7 +1,7 @@
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication,QHBoxLayout, QStackedWidget,QSizePolicy, QVBoxLayout
+from PyQt5.QtWidgets import QApplication,QHBoxLayout, QStackedWidget,QSizePolicy, QVBoxLayout,QMainWindow, QWidget
 from PyQt5.QtGui import QIcon
-from qframelesswindow import FramelessWindow
+from PyQt5.QtCore import Qt
 
 from src.view.PlayerView import PlayerView
 from src.view.SettingsView import SettingsView
@@ -11,7 +11,10 @@ from src.view.LikedView import LikedView
 from src.util.CustomControls import NavigationPanel, CustomTitleBar
 from src.util.CustomControls import Notification, Theme, RoundEdgesWidget
 
-class MainWindow(FramelessWindow):
+import sys
+import os
+
+class MainWindow(QMainWindow):
 
     def __init__(self, controller):
         super(MainWindow, self).__init__()
@@ -39,8 +42,10 @@ class MainWindow(FramelessWindow):
 
     def initWindow(self):
 
-        self.setTitleBar(CustomTitleBar(self))
+        self.setMenuWidget(CustomTitleBar(self))
+        self.setWindowFlag(Qt.FramelessWindowHint)
         self.setWindowIcon(QIcon('resources/icons/icon.svg'))
+
         self.setMinimumSize(900,700)
 
         palette = self.palette()
@@ -81,11 +86,14 @@ class MainWindow(FramelessWindow):
         self.upper_layout.setSpacing(0)
     
         self.vertical_main = QVBoxLayout()
-        self.vertical_main.setContentsMargins(10, self.titleBar.height(), 10, 10)
+        self.vertical_main.setContentsMargins(10, 10 ,10, 10)
         self.vertical_main.addLayout(self.upper_layout)
         self.vertical_main.addWidget(self.messagePanel)
         self.vertical_main.setSpacing(10)
-        self.setLayout(self.vertical_main)
+
+        central_widget = QWidget()
+        central_widget.setLayout(self.vertical_main)
+        self.setCentralWidget(central_widget)
 
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
         self.navigationPanel.button2.clicked.connect(lambda: self.switchView(2))

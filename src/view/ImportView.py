@@ -37,8 +37,10 @@ class ImportView(QFrame):
         self.mainLayout.addWidget(self.qscroll)
         self.mainLayout.setContentsMargins(20,20,20,20) 
         self.mainWidget.setLayout(self.mainLayout)
-
+        
+        self.vlayout.setContentsMargins(10,0,0,0)
         self.vlayout.addWidget(self.mainWidget)
+
         self.setLayout(self.vlayout)
 
 
