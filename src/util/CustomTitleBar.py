@@ -10,7 +10,6 @@ class CustomTitleBar(QWidget):
         self._parent = parent
         self.startMovePos = QPoint()
 
-        
         self.iconLabel = QLabel(self)
         pixmap = QPixmap('resources/icons/icon.svg')
         self.iconLabel.setPixmap(pixmap)
@@ -45,7 +44,6 @@ class CustomTitleBar(QWidget):
         self.closeButton.clicked.connect(self.close)
         self.closeButton.setMaximumSize(50, 50)
 
-
         self.layout = QHBoxLayout(self)
         self.layout.setContentsMargins(5,0,5,0)
         self.layout.setSpacing(15)
@@ -55,7 +53,6 @@ class CustomTitleBar(QWidget):
         self.layout.addWidget(self.maximizeButton)
         self.layout.addWidget(self.closeButton)
         
-
         self.setStyleSheet('styles/dark.qss')
         self.setContentsMargins(5,0,0,5)
 
