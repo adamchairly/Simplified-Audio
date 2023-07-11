@@ -48,11 +48,14 @@ class Controller:
             artist = song[2]
             album_name = song[3]
             codec = song[4]
-            file_path = song[5]
+            bitrate = song[5]
+            length = song[6]
+            file_path = song[7]
+
 
             data = MediaData(file_path)
             data = data.get_album_cover()
-            self.window.importView.add_track(data, title, artist, album_name, codec, file_path)
+            self.window.importView.add_track(data, title, artist, album_name, codec, bitrate, length, file_path)
 
         self.window.messagePanel.show_notification(f'Imported from: {path}')
     
@@ -66,13 +69,15 @@ class Controller:
             artist = song[2]
             album_name = song[3]
             codec = song[4]
-            file_path = song[5]
-            liked = song[6]
+            bitrate = song[5]
+            length = song[6]
+            file_path = song[7]
+            liked = song[8]
 
             if liked:
                 data = MediaData(file_path)
                 data = data.get_album_cover()
-                self.window.likedView.add_track(data, title, artist, album_name, codec, file_path)
+                self.window.likedView.add_track(data, title, artist, album_name, codec, bitrate, length, file_path)
     
     def _add_liked_track(self, file_path):
 
@@ -85,8 +90,10 @@ class Controller:
             codec = song[4]
             data = MediaData(file_path)
             data = data.get_album_cover()
+            bitrate = song[5]
+            length = song[6]
 
-            self.window.likedView.add_track(data, title, artist, album_name, codec, file_path)
+            self.window.likedView.add_track(data, title, artist, album_name, codec, bitrate, length, file_path)
     
     def _removed_liked_track(self, file_path):
         self.window.likedView.remove_track(self.media.audio.filepath)

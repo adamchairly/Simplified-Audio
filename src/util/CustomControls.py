@@ -530,13 +530,14 @@ class TrackWidget(QWidget):
 
     trackSelected = pyqtSignal(str)
 
-    def __init__(self, data, title, artist, album, codec, path):
+    def __init__(self, data, title, artist, album, codec, bitrate, length, path):
         super().__init__()
         self.setObjectName('TrackWidget')
 
         self.coverArtLabel = QLabel(self)
         pixmap = QPixmap()
-        pixmap.loadFromData(data)
+        if data != None:
+            pixmap.loadFromData(data)
         if pixmap.isNull():
             fallback_path = 'resources/no_media.png'
             pixmap.load(fallback_path)
@@ -547,7 +548,9 @@ class TrackWidget(QWidget):
         self.titleLabel = QLabel(title[:20])
         self.artistLabel = QLabel(artist[:20])
         self.albumLabel = QLabel(album[:20])
-        self.codecLabel = QLabel(codec[:5])
+        self.codecLabel = QLabel(codec[:20])
+        self.bitrateLabel = QLabel(bitrate[:20][:-2] + 'kbps')
+        self.lengthLabel = QLabel(length[:20])
         self.path = path
 
         self.layout = QHBoxLayout()
@@ -557,8 +560,14 @@ class TrackWidget(QWidget):
         self.layout.addWidget(self.artistLabel)
         self.layout.addWidget(self.albumLabel)
         self.layout.addWidget(self.codecLabel)
+        self.layout.addWidget(self.bitrateLabel)
+        self.layout.addWidget(self.lengthLabel)
 
         self.setLayout(self.layout)
 
+        for label in [self.titleLabel, self.artistLabel, self.albumLabel,
+                      self.codecLabel, self.bitrateLabel, self.lengthLabel]:
+            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        
     def mousePressEvent(self, event):
         self.trackSelected.emit(self.path)

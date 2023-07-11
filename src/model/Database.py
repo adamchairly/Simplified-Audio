@@ -18,13 +18,15 @@ class MusicDatabase:
                 Artist TEXT,
                 AlbumName TEXT,
                 Codec TEXT,
+                Bitrate TEXT,
+                Length TEXT,
                 FilePath TEXT UNIQUE,
                 Liked INTEGER DEFAULT 0
             )
         """)
         self.conn.commit()
     
-    def add_song(self, title, artist, album_name, codec, file_path, liked):
+    def add_song(self, title, artist, album_name, codec, bitrate, length, file_path, liked):
         self.cursor.execute("""
             SELECT SongID FROM Songs WHERE FilePath = ? OR (Title = ? AND Artist = ? AND AlbumName = ?)
         """, (file_path, title, artist, album_name))
@@ -33,9 +35,9 @@ class MusicDatabase:
             print(f"Song at {file_path} is already in the database.")
         else:
             self.cursor.execute("""
-                INSERT INTO Songs (Title, Artist, AlbumName, Codec, FilePath, Liked)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (title, artist, album_name, codec, file_path, liked))
+                INSERT INTO Songs (Title, Artist, AlbumName, Codec, Bitrate, Length, FilePath, Liked)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (title, artist, album_name, codec, bitrate, length, file_path, liked))
             self.conn.commit()
 
     def import_folder(self, folder_path):
@@ -45,11 +47,15 @@ class MusicDatabase:
                     file_path = os.path.join(root, file)
                     file_path = os.path.normpath(file_path)
                     media_data = MediaData(file_path)
+
                     title = media_data.title
                     artist = media_data.artist
                     album_name = media_data.album
                     codec = media_data.type
-                    self.add_song(title, artist, album_name, codec, file_path, liked = 0)
+                    bitrate = media_data.bitrate
+                    length = media_data.length
+                    
+                    self.add_song(title, artist, album_name, codec, bitrate, length, file_path, liked = 0)
 
     def get_song_by_path(self, file_path):
         self.cursor.execute("""

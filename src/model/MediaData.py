@@ -22,13 +22,12 @@ class MediaData(QObject):
         self.album = 'Unknown'
         self.type = 'Unknown'
         self.length = 0
+        self.bitrate = 'Unknown'
         self.artwork = None
         self.has_cover = False
         self.get_audio_metadata()
         
-
     def get_audio_metadata(self):
-
         file_extension = os.path.splitext(self.filepath)[1].lower()
 
         try:
@@ -51,7 +50,8 @@ class MediaData(QObject):
         self.album = self.audio.get('TALB', ['Unknown'])[0]
         self.type = 'mp3'
         self.length = self.convert_seconds(self.audio.info.length)
-        
+        self.bitrate = self.audio.info.bitrate / 1000
+
         self.has_cover = False
         if self.audio.tags is not None:
             for tag in self.audio.tags.values():
@@ -67,9 +67,11 @@ class MediaData(QObject):
         self.album = self.audio.get('album', ['Unknown'])[0]
         self.type = 'flac'
         self.length = self.convert_seconds(self.audio.info.length)
-        
-        self.has_cover = len(self.audio.pictures) > 0
+        self.bitrate = self.audio.info.bitrate / 1000
+        print(self.bitrate)
 
+        self.has_cover = len(self.audio.pictures) > 0
+        
     def get_wav_metadata(self, filepath):
 
         self.audio = mutagen.File(filepath)
@@ -78,6 +80,8 @@ class MediaData(QObject):
         self.artist = 'Unknown'
         self.album = 'Unknown'
         self.has_cover = False
+        self.bitrate = self.audio.info.bitrate / 1000
+        print(self.bitrate)
 
     def get_m4a_metadata(self, filepath):
 
@@ -88,6 +92,8 @@ class MediaData(QObject):
         self.artist = self.audio.get('\xa9ART', ['Unknown'])[0]
         self.album = self.audio.get('\xa9alb', ['Unknown'])[0]
         self.has_cover = 'covr' in self.audio
+        self.bitrate = self.audio.info.bitrate / 1000
+        print(self.bitrate)
 
     def extract_album_cover(self, output_path):
         
@@ -127,10 +133,4 @@ class MediaData(QObject):
         minutes, seconds = divmod(seconds, 60)
         return f"{int(minutes)}:{int(seconds):02d}"
     
-    def import_folder(self, folder):
 
-        for filename in os.listdir(folder):
-            filepath = os.path.join(folder, filename)
-            if os.path.isfile(filepath):
-                track = MediaData(filepath)
-                track.get_audio_metadata()

@@ -10,8 +10,9 @@ class ImportView(QFrame):
         self.trackWidgets = []
         self._initUi()
 
-    def add_track(self, data, title, artist, album, codec, path):
-        self.trackWidget = TrackWidget(data, title, artist, album, codec, path)
+    def add_track(self, data, title, artist, album, codec, bitrate, length, path):
+       
+        self.trackWidget = TrackWidget(data, title, artist, album, codec, bitrate, length, path)
         self.trackWidgets.append(self.trackWidget)
         self.trackWidget.trackSelected.connect(self.on_track_selected)
         self.scrollAreaLayout.addWidget(self.trackWidget)
@@ -39,10 +40,11 @@ class ImportView(QFrame):
         self.mainWidget.setLayout(self.mainLayout)
         
         self.vlayout.setContentsMargins(10,0,0,0)
+        self.vlayout.addWidget(self.header)
         self.vlayout.addWidget(self.mainWidget)
 
         self.setLayout(self.vlayout)
-
+       
 
     
 
