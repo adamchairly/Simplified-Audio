@@ -334,6 +334,7 @@ class MetaTablePanel(RoundEdgesWidget):
         self.album_name_label = QLabel(f"Album Name: ")
         self.length_label = QLabel(f"Track Length: ")
         self.codec_label = QLabel(f"Track Codec: ")
+        self.bitrate_label = QLabel(f'Track Bitrate:')
 
         self.artist_data = QLabel("Artist Data")
         self.album_data = QLabel("Album Data")
@@ -350,6 +351,7 @@ class MetaTablePanel(RoundEdgesWidget):
         layout.addWidget(self.album_name_label, 0, 2)
         layout.addWidget(self.length_label, 0, 3)
         layout.addWidget(self.codec_label, 2, 0)
+        layout.addWidget(self.bitrate_label, 2, 1)
         layout.addWidget(self.separator, 1, 0, 1, 4)
 
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -361,6 +363,7 @@ class MetaTablePanel(RoundEdgesWidget):
         self.album_name_label.setText(f"Album Name: {audio.album}")
         self.length_label.setText(f"Track Length: {audio.length}")
         self.codec_label.setText(f"Track Codec: {audio.type}")
+        self.bitrate_label.setText(f'Track Bitrate:{str(audio.bitrate)[:-2]} kbps')
 
 class PathSelectPanel(RoundEdgesWidget):
 

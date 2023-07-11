@@ -40,7 +40,6 @@ class ImportView(QFrame):
         self.mainWidget.setLayout(self.mainLayout)
         
         self.vlayout.setContentsMargins(10,0,0,0)
-        self.vlayout.addWidget(self.header)
         self.vlayout.addWidget(self.mainWidget)
 
         self.setLayout(self.vlayout)
