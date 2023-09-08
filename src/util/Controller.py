@@ -1,5 +1,6 @@
 from src.model.MediaData import MediaData
 import os
+from PyQt5.QtMultimedia import QMediaPlayer
     
 class Controller:
      
@@ -10,28 +11,28 @@ class Controller:
         return self.media.audio
     
     def _isPlaying(self):
-        return True if self.media.player.is_playing() else False
+        return True if self.media.state() == QMediaPlayer.PlayingState else False
     
     def _stopPlaying(self):
-        self.media.player.pause()
+        self.media.pause()
     
     def _startPlaying(self):
-        self.media.player.play()
+        self.media.play()
     
     def _setPosition(self, position):
-        self.media.player.set_position(position)
+        self.media.setPosition(int(position * self.media.duration() / 100))
 
     def _requestPlayerTime(self):
-        return self.media.player.get_time()
+        return self.media.position()
     
     def _requestPlayerLength(self):
-        return self.media.player.get_length()
+        return self.media.duration()
     
     def _muteAudio(self, bool):
-        self.media.player.audio_set_mute(bool)
+        self.media.setMuted(bool)
     
     def _setVolume(self, volume):
-        self.media.player.audio_set_volume(volume)
+        self.media.setVolume(volume)
 
     def _musicFolderChanged(self, path):
 
@@ -102,7 +103,6 @@ class Controller:
     def _requestLoadTrack(self, path):
         self.media.set_media(path)
         self._setVolume(50)
-        self.window.playerView.albumPanel.extractButton.setEnabled(True)
         self.window.playerView.albumPanel.likeButton.setEnabled(True)
         self.window.playerView.mediaChanged(self.media.audio, self.db.get_like_state(path))
 
@@ -119,9 +119,6 @@ class Controller:
     def _log_message(self, message):
         self.window.messagePanel.show_notification(message, 3000)
     
-    def _applyEq(self, settings):
-        self.media.apply_equalizer_settings(settings)
-
     def _track_liked(self, value):
         self.db.like_song(self.media.audio.filepath)
 
@@ -136,7 +133,7 @@ class Controller:
         else: self.window._set_theme_dark()
 
     def positionChange(self):
-        self.window.playerView.positionChanged(self.media.player.get_time() / 1000, self.media.player.get_length() / 1000)
+        self.window.playerView.positionChanged(self.media.position() / 1000 , self.media.duration() / 1000)
 
     def setWindow(self, window):
         self.window = window
@@ -144,7 +141,6 @@ class Controller:
         self._populate_liked()
 
         self.window.settingsView.importPanel.folderChanged.connect(self._musicFolderChanged)
-        self.window.settingsView.extractPanel.folderChanged.connect(self._log_message)
         self.window.settingsView.switch_panel.theme_changed.connect(self.on_theme_changed)
 
         self.window.playerView.albumPanel.track_liked.connect(self._track_liked)
@@ -157,25 +153,20 @@ class Controller:
     
     def setMedia(self, mediaPlayer):
         self.media = mediaPlayer
-        self.media.positionChanged.connect(self.positionChange)
-        self.media.mediaEnd.connect(self.mediaEnd)
+        self.media.customPositionChanged.connect(self.positionChange)
+        self.media.customMediaEnd.connect(self.mediaEnd)
         
     def clear_layout(self, layout):
         for i in reversed(range(layout.count())):
             item = layout.itemAt(i)
 
-            # Check if the item is a widget
             if item.widget() is not None:
                 widget = item.widget()
-                # Remove it from the layout
                 layout.removeWidget(widget)
-                # Delete the widget
                 widget.deleteLater()
+
             elif item.layout() is not None:
-                # The item is a layout, so recursively delete its children
                 self.clear_layout(item.layout())
-                # Then remove the layout from its parent layout
                 layout.removeItem(item)
-                # And finally delete the layout itself
                 item.deleteLater()
    

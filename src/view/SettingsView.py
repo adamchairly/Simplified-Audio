@@ -11,15 +11,12 @@ class SettingsView(QFrame):
         
     def initUi(self):
         self.importPanel = PathSelectPanel()
-        self.extractPanel = ExtractPanel()
         self.switch_panel = SwitchPanel()
 
         vLayout = QVBoxLayout()
         vLayout.setContentsMargins(10,0,10,0)
         vLayout.addWidget(self.importPanel)
-        vLayout.addWidget(self.extractPanel)
         vLayout.setStretchFactor(self.importPanel, 0)
-        vLayout.setStretchFactor(self.extractPanel, 0)
         vLayout.addStretch(1)
         vLayout.addWidget(self.switch_panel)
         self.setLayout(vLayout)

@@ -68,18 +68,16 @@ class NavigationPanel(RoundEdgesWidget):
     def initUi(self):
 
         self.button1 = CircularButton('resources/icons/player.svg')
-        self.button3 = CircularButton('resources/icons/folder.svg')
-        self.button4 = CircularButton('resources/icons/mixer.svg')
-        self.button5 = CircularButton('resources/icons/heart.svg')
-        self.button2 = CircularButton('resources/icons/settings.svg')
+        self.button2 = CircularButton('resources/icons/folder.svg')
+        self.button3 = CircularButton('resources/icons/heart.svg')
+        self.button4 = CircularButton('resources/icons/settings.svg')
 
         self.vBoxLayout = QVBoxLayout()
         self.vBoxLayout.addWidget(self.button1)
-        self.vBoxLayout.addWidget(self.button3)
-        self.vBoxLayout.addWidget(self.button5)
-        self.vBoxLayout.addWidget(self.button4)
-        self.vBoxLayout.addStretch(1)
         self.vBoxLayout.addWidget(self.button2)
+        self.vBoxLayout.addWidget(self.button3)
+        self.vBoxLayout.addStretch(1)
+        self.vBoxLayout.addWidget(self.button4)
 
         palette = self.palette()
         palette.setColor(QPalette.Background, QColor('#545463'))
@@ -211,10 +209,6 @@ class AlbumPanel(RoundEdgesWidget):
             self.likeButton.clicked.connect(self.likeClick)
             self.likeButton.tagged = False
 
-            self.extractButton = CircularButton('resources/icons/save.svg')
-            self.extractButton.setEnabled(False)
-            self.extractButton.clicked.connect(self.saveClick)
-
             shadow = QGraphicsDropShadowEffect()
             shadow.setBlurRadius(20)
             shadow.setXOffset(5)
@@ -232,7 +226,6 @@ class AlbumPanel(RoundEdgesWidget):
 
             h2Layout.addItem(self.spacer1)
             h2Layout.addWidget(self.likeButton)
-            h2Layout.addWidget(self.extractButton)
             h2Layout.addItem(self.spacer2)
 
             vLayout.setContentsMargins(0,0,0,20)
@@ -308,10 +301,6 @@ class AlbumPanel(RoundEdgesWidget):
                     background-color: #38717184;
                 }
                 """)
-            
-        def saveClick(self):
-            self.controller._requestAudio().extract_album_cover(self.controller.window.settingsView.extractPanel.path)
-            self.controller._log_message(f'Album cover extracted to: {self.controller.window.settingsView.extractPanel.path}')
         
         def update_ui(self, audio, value):
             self.setAlbumCover(audio.get_album_cover(), 250)

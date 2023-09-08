@@ -13,7 +13,7 @@ class Application(QApplication):
 
         self.controller = Controller()
 
-        self.mediaPlayer = Player('')
+        self.mediaPlayer = Player("D:\Zene\garage-break\Bicep - Glue.mp3")
         self.controller.setMedia(self.mediaPlayer)
 
         self.db = MusicDatabase()

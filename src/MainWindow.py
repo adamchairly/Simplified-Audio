@@ -4,7 +4,6 @@ from PyQt5.QtCore import Qt
 from src.view.PlayerView import PlayerView
 from src.view.SettingsView import SettingsView
 from src.view.ImportView import ImportView
-from src.view.EqualizerView import EqualizerView
 from src.view.LikedView import LikedView
 from src.util.CustomControls import NavigationPanel
 from src.util.CustomControls import Notification, Theme, RoundEdgesWidget
@@ -68,16 +67,15 @@ class MainWindow(FramelessWindow):
         self.playerView =  PlayerView(self.controller)
         self.settingsView = SettingsView(self.controller)
         self.importView = ImportView(self.controller)
-        self.eqView = EqualizerView(self.controller)
         self.messagePanel = Notification('Welcome!')
 
         self.viewStack = QStackedWidget(self)
         self.viewStack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.viewStack.addWidget(self.playerView)
         self.viewStack.addWidget(self.importView)
-        self.viewStack.addWidget(self.settingsView)
-        self.viewStack.addWidget(self.eqView)
         self.viewStack.addWidget(self.likedView)
+        self.viewStack.addWidget(self.settingsView)
+        
         
         self.upper_layout = QHBoxLayout()
         self.upper_layout.addWidget(self.navigationPanel)
@@ -102,10 +100,10 @@ class MainWindow(FramelessWindow):
         self.setCentralWidget(central_widget)
 
         self.navigationPanel.button1.clicked.connect(lambda: self.switchView(0))
-        self.navigationPanel.button2.clicked.connect(lambda: self.switchView(2))
+        self.navigationPanel.button2.clicked.connect(lambda: self.switchView(1))
+        self.navigationPanel.button3.clicked.connect(lambda: self.switchView(2))
         self.navigationPanel.button4.clicked.connect(lambda: self.switchView(3))
-        self.navigationPanel.button5.clicked.connect(lambda: self.switchView(4))
-        self.navigationPanel.button3.clicked.connect(lambda: self.switchView(1))
+        
     
     def switchView(self, index):
         self.viewStack.setCurrentIndex(index)
@@ -132,7 +130,6 @@ class MainWindow(FramelessWindow):
             self.playerView,
             self.settingsView,
             self.importView,
-            self.eqView,
             self.likedView,
             self.messagePanel
         ]

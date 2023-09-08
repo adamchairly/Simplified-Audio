@@ -23,14 +23,12 @@ class PlayerView(QFrame):
     def right(self):
         self.controller._get_next_song()
 
-    def setPosition(self, position):
-
-        self.controller._setPosition(float(position / 100))
+    def setPosition(self, position): #oke
+        self.controller._setPosition(position)
         current_time = self.controller._requestPlayerTime() / 1000
         self.playerPanel.currentTime.setText(self.convert_seconds(int(current_time))) 
        
     def positionChanged(self, current_time, length):
-
         self.playerPanel.currentTime.setText(self.convert_seconds(int(current_time))) 
         if length != 0: 
             percentage_played = (current_time / length) * 100
@@ -68,6 +66,13 @@ class PlayerView(QFrame):
     def setController(self, controller):
         self.controller = controller
     
+    def slider_pressed(self):
+        self.playerPanel.slider.sliderMoved.disconnect(self.setPosition)
+    
+    def slider_released(self):
+        self.setPosition(self.playerPanel.slider.value())
+        self.playerPanel.slider.sliderMoved.connect(self.setPosition)
+
     def initUi(self):
         self.playerPanel = PlayerPanel()
         self.volumePanel = VolumePanel()
@@ -89,6 +94,8 @@ class PlayerView(QFrame):
         self.playerPanel.leftButton.clicked.connect(self.left)
         self.playerPanel.rightButton.clicked.connect(self.right)
         self.playerPanel.slider.sliderMoved.connect(self.setPosition)
+        self.playerPanel.slider.sliderPressed.connect(self.slider_pressed)
+        self.playerPanel.slider.sliderReleased.connect(self.slider_released)
 
         self.volumePanel.muteButton.clicked.connect(self.mute)
         self.volumePanel.unmuteButton.clicked.connect(self.unMute)

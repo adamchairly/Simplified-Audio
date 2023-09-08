@@ -1,12 +1,11 @@
 import os
-import mutagen
+import io
 from PyQt5.QtCore import pyqtSignal, QObject
+import mutagen
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 from mutagen.flac import FLAC
 from mutagen.mp4 import MP4
-from PIL import Image
-import io
 
 class MediaData(QObject):
 
@@ -68,7 +67,6 @@ class MediaData(QObject):
         self.type = 'flac'
         self.length = self.convert_seconds(self.audio.info.length)
         self.bitrate = self.audio.info.bitrate / 1000
-        print(self.bitrate)
 
         self.has_cover = len(self.audio.pictures) > 0
         
@@ -81,7 +79,6 @@ class MediaData(QObject):
         self.album = 'Unknown'
         self.has_cover = False
         self.bitrate = self.audio.info.bitrate / 1000
-        print(self.bitrate)
 
     def get_m4a_metadata(self, filepath):
 
@@ -93,30 +90,6 @@ class MediaData(QObject):
         self.album = self.audio.get('\xa9alb', ['Unknown'])[0]
         self.has_cover = 'covr' in self.audio
         self.bitrate = self.audio.info.bitrate / 1000
-        print(self.bitrate)
-
-    def extract_album_cover(self, output_path):
-        
-        if self.audio is None:
-            self.errorOccured.emit(str('No audio currently loaded.'))
-            return
-
-        artwork = self.get_album_cover()
-        filename = os.path.splitext(os.path.basename(self.audio.filename))[0]
-        output_file_path = os.path.join(output_path, f'{filename}.jpg')
-
-        os.makedirs(output_path, exist_ok=True)
-
-        if artwork is not None:
-            try:
-                with Image.open(io.BytesIO(artwork)) as img:
-                    img.thumbnail((1280, 1280))
-                    img.save(output_file_path, 'JPEG', optimize=True, quality=100)
-                self.errorOccured.emit(f'Saved album cover for {filename}')
-            except Exception as e:
-                self.errorOccured.emit(f'Error processing album cover for {filename}: {str(e)}')
-        else:
-            self.errorOccured.emit(f'No album cover found for {filename}')
 
 
     def get_album_cover(self):
@@ -132,5 +105,3 @@ class MediaData(QObject):
 
         minutes, seconds = divmod(seconds, 60)
         return f"{int(minutes)}:{int(seconds):02d}"
-    
-

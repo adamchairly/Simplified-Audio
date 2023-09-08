@@ -1,51 +1,36 @@
-from PyQt5.QtCore import QObject, pyqtSignal
-import vlc
-from vlc import EventType
+from PyQt5.QtCore import QObject, pyqtSignal, QUrl
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from src.model.MediaData import MediaData
 
-class Player(QObject):
+class Player(QMediaPlayer):
     
-    positionChanged = pyqtSignal()
-    mediaChanged = pyqtSignal()
-    mediaEnd = pyqtSignal()
+    customPositionChanged = pyqtSignal()
+    customMediaChanged = pyqtSignal()
+    customMediaEnd = pyqtSignal()
 
     def __init__(self, media_path):
         super().__init__()
 
-        self.player = vlc.MediaPlayer(media_path)
+        self.setMedia(QMediaContent(QUrl.fromLocalFile(media_path)))
         self.audio = MediaData(media_path)
-        self.player.audio_set_volume(50)
+        self.setVolume(50)
 
-        self.events = self.player.event_manager()
-        self.events.event_attach(EventType.MediaPlayerPositionChanged, self.position_changed, self.player)
-        self.events.event_attach(EventType.MediaPlayerEndReached, self.media_end, self.player)
-        
-        
-        self.player.play()
+        # Connect built-in positionChanged signal to custom slot
+        self.positionChanged.connect(self.position_changed)
+        self.mediaStatusChanged.connect(self.media_status_changed)
+        self.play()
 
     def set_media(self, media_path):
-        self.player.stop()
-        self.player.set_mrl(media_path)
+        self.stop()
+        self.setMedia(QMediaContent(QUrl.fromLocalFile(media_path)))
         self.audio = MediaData(media_path)
-        self.player.play()
+        self.play()
         
-        self.mediaChanged.emit()
+        self.customMediaChanged.emit()
 
-    def position_changed(self, event, player):
+    def position_changed(self, position):
+        self.customPositionChanged.emit()
 
-        self.positionChanged.emit() 
-
-    def media_end(self, event, player):
-
-        if self.player.is_playing():
-            self.player.stop()
-
-        self.mediaEnd.emit()
-    
-    def apply_equalizer_settings(self, settings):
-        equalizer = vlc.AudioEqualizer()
-
-        for i, gain in enumerate(settings):
-            equalizer.set_amp_at_index(gain, i)
-
-        self.player.set_equalizer(equalizer)
+    def media_status_changed(self, status):
+        if status == QMediaPlayer.EndOfMedia:
+            self.customMediaEnd.emit()
