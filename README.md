@@ -26,6 +26,7 @@ After that, the imported songs will be stored in a database, no need
 for importing multiple times.
 
 ![Screenshot 1](./resources/screenshots/screenshot_1.png)
+![Screenshot 1](./resources/screenshots/screenshot_3.png)
 
 ## Credit
 
