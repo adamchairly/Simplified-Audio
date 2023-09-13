@@ -14,6 +14,7 @@ Multi-format audio player written in **Python** using **PyQt5** and **Mutagen**.
  - **Mute/Unmute**
  - **Skip** to a part of the song using the slider
  - Imported song section, with **minimized display** of the album cover
+ - **Notification** bar at the bottom
 	
 The playback capability depends on the underlying multimedia framework that is installed on your system. 
 
